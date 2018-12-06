@@ -1,190 +1,20 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
+<html>
 <style>
-
-  body {
-    font: 10px sans-serif;
-    height:800px;
+  body{
+    background-color: blue;
   }
 
-  .axis path, .axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-  }
-
-  .dot {
-    stroke: #000;
-    stroke-width: .5px;
-  }
-
-  .tooltip {
-    position: absolute;
-    width: 200px;
-    height: 28px;
-    pointer-events: none;
-  }
-
-  .chart {
-    display: inline-block;
-    height: 180px;
-    width: 400px;
-    margin: 30px;
-  }
 </style>
-<body>
-<script src="https://d3js.org/d3.v3.min.js"></script>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://d3js.org/d3-brush.v3.min.js"></script>
-<script>
-
-  var margin = {top: 20, right: 20, bottom: 20, left: 30},
-          width = 800 - margin.left - margin.right,
-          height = 400 - margin.top - margin.bottom;
-
-  var color = d3.scaleOrdinal(d3.schemeCategory20);
-
-  var tooltip = d3.select("body").append("div")
-          .attr("class", "tooltip")
-          .style("opacity", 0);
-
-  function scatterplot(el, data, w, h, var_x, var_y, var_r, var_color,position) {
-
-    var x = d3.scaleLinear()
-            .range([0, w]);
-
-    var y = d3.scaleLinear()
-            .range([h, 0]);
-
-    var r = d3.scaleSqrt()
-            .range([2,10]);
+<title>
 
 
-    x.domain(d3.extent(data, function(d){
-      return d[var_x];
-    })).nice();
 
-    y.domain(d3.extent(data, function(d){
-      return d[var_y];
-    })).nice();
+</title>
+  <body>
+    <h1>
+      Hello World !!
+    </h1>
 
-    r.domain(d3.extent(data, function(d){
-      return d[var_r];
-    })).nice();
+  </body>
 
-    var svg = el.append("svg")
-            .attr("width", w + margin.left + margin.right)
-            .attr("height", h + margin.bottom + margin.top)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    //vertical lines
-    svg.selectAll(".vline").data(d3.range(20)).enter()
-            .append("line")
-            .attr("x1", function (d) {
-              return d * 50;
-            })
-            .attr("x2", function (d) {
-              return d * 50;
-            })
-            .attr("y1", function (d) {
-              return 0;
-            })
-            .attr("y2", function (d) {
-              return 500;
-            })
-            .style("stroke", "#aaaaaa");
-
-// horizontal lines
-    svg.selectAll(".hline").data(d3.range(20)).enter()
-            .append("line")
-            .attr("y1", function (d) {
-              return d * 25;
-            })
-            .attr("y2", function (d) {
-              return d * 25;
-            })
-            .attr("x1", function (d) {
-              return 0;
-            })
-            .attr("x2", function (d) {
-              return 500;
-            })
-            .style("stroke", "#aaaaaa");
-    if(position === 12 || position === 13 || position === 14 || position ===15){
-      var xAxis = d3.axisBottom()
-              .scale(x)
-              .ticks(5);
-      svg.append('g')
-              .attr('transform', 'translate(0,' + h + ')')
-              .attr('class', 'x axis')
-              .call(xAxis);
-    }
-    if(position === 0 || position === 4 || position === 8 || position === 12){
-
-      var yAxis = d3.axisLeft()
-              .scale(y).ticks(5);
-      svg.append('g')
-              .attr('transform', 'translate(0,0)')
-              .attr('class', 'y axis')
-              .call(yAxis);
-    }
-
-    svg.filter(function(){ return var_x === var_y}).append('text')
-            .attr('x', 74)
-            .attr('y', 12)
-            .attr('text-anchor', 'end')
-            .attr('class', 'label')
-            .text(var_x)
-            .style("fill","blue");
-
-    svg.selectAll(".dot")
-            .data(data)
-            .enter().append("circle")
-            .attr("class", "dot")
-            .attr("r", function(d) { return r(d[var_r])-2; })
-            .attr("cx", function(d) { return x(d[var_x]); })
-            .attr("cy", function(d) { return y(d[var_y]); })
-            .style("fill", function(d) { return color(d[var_color]); })
-            .on("mouseover", function(d){
-              // highlight on
-              d3.selectAll(".dot").filter(function(e) {
-                return e === d;
-              })
-                      .style("stroke-width", 10)
-            })
-            .on("mouseout", function(d){
-              d3.selectAll(".dot").filter(function(e) {
-                return e === d;
-              })
-                      .style("stroke-width", .4)
-            })
-            .on("click", function(d){
-            });
-
-  }
-
-  d3.csv('iris.csv', function(error, data){
-    data.forEach(function(d){
-      d.sepal_length = +d.sepal_length;
-      d.sepal_width  = +d.sepal_width;
-      d.petal_length = +d.petal_length;
-      d.petal_width  = +d.petal_width;
-    });
-
-    var all_scatter_plot = [["petal_width","sepal_length"],
-      ["petal_length","sepal_length"],["sepal_width","sepal_length"],
-      ["sepal_length","sepal_length"],["petal_width","sepal_width"],
-      ["petal_length","sepal_width"],["sepal_width","sepal_width"],
-      ["sepal_length","sepal_width"],["petal_width","petal_length"],
-      ["petal_length","petal_length"],["sepal_width","petal_length"],
-      ["sepal_length","petal_length"], ["petal_width","petal_width"],
-      ["petal_length","petal_width"],["sepal_width","petal_width"],
-      ["sepal_length","petal_width"]
-    ]
-    all_scatter_plot.forEach(function(scat_plot,i) {
-      return scatterplot(d3.select("body"), data, width/4 -5, height/4 -8 , scat_plot[0],scat_plot[1] , "petal_width", "species",i)
-    })
-  })
-
-</script>
+</html>
