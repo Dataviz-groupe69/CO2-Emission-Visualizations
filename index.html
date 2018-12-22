@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider/build/d3-simple-slider.js"></script>
     <title>
         DataVis Project
     </title>
@@ -9,11 +11,37 @@
         body {
             background-color: rgb(255, 255, 255);
         }
+        #slider{
+            background-color: aqua;
+            width: 40%;
+            margin-left: 30%;
+        }
     </style>
 </head>
 <body>
-<h1>
-    Hello World !!
-</h1>
+<div>
+    <input id="slider" type="range" value="1951" min="1951" max="2016" step="1" width="200" />
+    <span id="year">1951</span>
+</div>
+<script>
+
+    d3.select("#slider").on("input", function(){
+        d3.select('#year').text('year : '+this.value) ;
+
+    });
+    var svg = d3.select( "body" )
+        .append( "svg" )
+    var jsonCircles = [
+          { "x_axis": 30, "y_axis": 30, "radius": 20, "color" : "green" },
+          { "x_axis": 70, "y_axis": 70, "radius": 20, "color" : "purple"},
+          { "x_axis": 110, "y_axis": 100, "radius": 20, "color" : "red"}];
+    var circle = svg.selectAll('circle').data(jsonCircles).enter()
+    circle.append('circle').attr("cx", function (d) { return d.x_axis; })
+                          .attr("cy", function (d) { return d.y_axis; })
+                          .attr("r", function (d) { return d.radius; })
+                            .style('fill',function (d) {
+                                return d.color
+                            })
+</script>
 </body>
 </html>
