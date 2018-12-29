@@ -12,19 +12,19 @@
             background-color: rgb(255, 255, 255);
         }
         #slider{
-            background-color: aqua;
+            background-color: rgb(0, 255, 255);
+            color:#00FFFF;
             width: 40%;
             margin-left: 30%;
         }
         circle {
-            fill: rgb(31, 119, 180);
+
             fill-opacity: .25;
             stroke: rgb(31, 119, 180);
             stroke-width: 1px;
         }
 
         .leaf circle {
-            fill: #ffa268;
             fill-opacity: 1;
         }
 
@@ -57,7 +57,7 @@ const diameter = 1000,
 
 const svg = d3.select("body").append("svg")
     .attr("width", 2*diameter)
-    .attr("height", 2*diameter)
+    .attr("height", diameter+200)
     .attr("id", "svg");
 
 const g = svg.append("g").attr("transform", "translate(2,2)");
@@ -94,8 +94,19 @@ d3.json("./final.json",function(error, root) {
             .attr("class", function(d) { return d.children ? "node" : "leaf node"; })
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
         node.append("circle")
-            .attr("r", function(d) { return d.r; });
-
+            .attr("r", function(d) { return d.r; })
+            .attr("fill",function (d) {
+                if(d.children){
+                    return "#1F77B4";
+                }else{
+                    console.log(d);
+                    if((d.value/d.parent.value)>=0.3){
+                        return "#b43122";
+                    }else{
+                        return "#1F77B4";
+                    }
+                }
+            });
         node
             .on("mouseover",function (d) {
                 if(d.children) {
@@ -125,6 +136,7 @@ d3.json("./final.json",function(error, root) {
             .append("text")
             .attr("dy", "0.3em")
             .style("font-weight", "bold")
+            .attr("fill","#FFFFFF")
             .text(function(d) { return ( d.data.pays.substring(0, d.r / 3)); })
     }
 
