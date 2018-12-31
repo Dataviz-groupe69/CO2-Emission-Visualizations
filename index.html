@@ -192,7 +192,7 @@ d3.json("./final_1.json",function(error, root) {
             for(var i=0;i<data.annees.length;i++){
                 data_object.push({"annee":data.annees[i],"emission":data.emissions[i]})
             } */
-        var y = d3.scaleLinear().range([longueur_graph, 100]);
+        var y = d3.scaleLinear().range([longueur_graph*1.2, longueur_graph*0.3]);
         //var x = d3.scaleLinear().range([1100,1800])
         //var x = d3.scaleBand().range([1100,1800]);
         var parseTime = d3.timeParse("%d-%b-%y");
@@ -211,7 +211,7 @@ d3.json("./final_1.json",function(error, root) {
         //console.log(data)
         var area = d3.area()
             .x(function(d) { return x(new Date(d.annee,0,0)); })
-            .y0(Math.ceil(screen.width*0.4))
+            .y0(longueur_graph*1.2)
             .y1(function(d) { return y(d.emission); });
 
        //x.domain(d3.extent(data_object, function(d) { return new Date(d.annee,0,0); }));
@@ -243,7 +243,7 @@ d3.json("./final_1.json",function(error, root) {
 
         svg.append("g")
             .attr("id","Xaxis")
-            .attr("transform", "translate(0," + longueur_graph + ")")
+            .attr("transform", "translate(0," + longueur_graph*1.2 + ")")
             .call(xAxis);
 
         // add the Y Axis
@@ -254,7 +254,7 @@ d3.json("./final_1.json",function(error, root) {
         // ici on ajoute le titre de line chart
         svg.append("text")
             .attr("x", diameter*1.4)
-            .attr("y", 40)
+            .attr("y", longueur_graph*0.2)
             .attr("id","title")
             .attr("text-anchor", "middle")
             .style("font-size", "18px")
