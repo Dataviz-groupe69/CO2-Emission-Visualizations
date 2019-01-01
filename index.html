@@ -50,6 +50,9 @@
             fill: #a5de8f;
         }
         */
+        #graph,#number_graph{
+            visibility: hidden;
+        }
     </style>
 </head>
 <body>
@@ -64,11 +67,20 @@
     <label>
         <input  type="radio" name="brand" value="Option2" />
     </label>
+    <input id="number_graph" type="range" value="1" min="1" max="10" step="1" width="8%" />
+    <span id="graph" >1 graph comparaison</span>
 </div>
 <script>
     var Prograss = true;
-    var brands = ['Progress Graph', 'Comparaison Graph']
-
+    var brands = ['Progress Graph', 'Comparaison Graph'];
+    var limit = 1;
+    d3.select("#number_graph").on("input",function () {
+        d3.select("#graph").text(this.value + " graphs comparaison");
+        limit = Number(this.value);
+        remove_graph();
+        svg.selectAll("#legend").remove();
+        //draw_nodes(root_2,choice,year,limit);
+    })
     var radios =
         d3.select('.panel.left').selectAll('input[name="brand"]').data(brands);
     d3.selectAll("label")
@@ -79,9 +91,9 @@
         .style("font-size", 16)
         .style("font-weight", "bold");
 
-const diameter = Math.ceil(screen.width*0.6);
+const diameter = Math.ceil(window.innerWidth*0.6);
     format = d3.format(",d");
-var longueur_graph = Math.ceil(screen.width*0.4);
+var longueur_graph = Math.ceil(window.innerWidth*0.4);
 const svg = d3.select("body").append("svg")
     .attr("width", 1.8*diameter)
     .attr("height", diameter+200)
@@ -95,6 +107,13 @@ const pack = d3.pack()
 
     d3.select("body").selectAll('input[name="brand"]').on("change", function() {
             Prograss = ! Prograss;
+            if(!Prograss){
+                document.getElementById("graph").style.visibility = "visible";
+                document.getElementById("number_graph").style.visibility = "visible";
+            }else{
+                document.getElementById("graph").style.visibility = "hidden";
+                document.getElementById("number_graph").style.visibility = "hidden";
+            }
             console.log(Prograss);
             remove_graph();
             svg.selectAll("#legend").remove();
@@ -109,9 +128,10 @@ d3.json("./final_1.json",function(error, root) {
         d3.select('#year').text(year);
         //console.log(root_2);
         g.selectAll(".node").remove();
-        draw_nodes(root_2,choice,year)
+        draw_nodes(root_2,choice,year);
     });
-    draw_nodes(root,69,2019)
+    draw_nodes(root,69,2019);
+
 
 })
 
@@ -154,7 +174,7 @@ d3.json("./final_1.json",function(error, root) {
             .on("click",function (d) {
                 if(!Prograss) {
                     console.log(data_comparaison.length);
-                    if (data_comparaison.length >= 5) {
+                    if (data_comparaison.length >= limit) {
                         data_comparaison = [];
                         names = [];
                         indices = [];
@@ -184,7 +204,7 @@ d3.json("./final_1.json",function(error, root) {
                         names.push(d.data.pays);
                         indices.push(3)
                     }
-                    if (data_comparaison.length == 5) {
+                    if (data_comparaison.length == limit) {
                         graphs_comparaison(data_comparaison, names, indices);
                     }
                 }
