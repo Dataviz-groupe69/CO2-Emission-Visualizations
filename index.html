@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
-
     <script src="https://unpkg.com/d3-simple-slider/build/d3-simple-slider.js"></script>
     <title>
         DataVis Project
@@ -35,10 +34,16 @@
             text-anchor: middle;
             cursor: pointer; cursor: hand
         }
+
+        .legend {
+            font-size: 12px;
+            font-weight: bold;
+            text-anchor: middle;
+        }
+
         .line {
-            fill: none;
-            stroke: #b43122;
-            stroke-width: 4px;
+            fill:none;
+            stroke-width: 3px;
         }
         /*
         .area {
@@ -49,16 +54,36 @@
 </head>
 <body>
 <div>
-    <input id="slider" type="range" value="1" min="1" max="100" step="1" width="200" />
-    <span id="year">1950</span>
+    <input id="slider" type="range" value="69" min="1" max="101" step="1" width="200" />
+    <span id="year">2019</span>
+</div>
+<div>
+    <label>
+        <input  type="radio" name="brand" value="Option1" checked="true"/>
+    </label>
+    <label>
+        <input  type="radio" name="brand" value="Option2" />
+    </label>
 </div>
 <script>
+    var Prograss = true;
+    var brands = ['Progress Graph', 'Comparaison Graph']
+
+    var radios =
+        d3.select('.panel.left').selectAll('input[name="brand"]').data(brands);
+    d3.selectAll("label")
+        .data(brands)
+        .append("text")
+        .text(function(d) { return d; })
+        .style("font-family", "Arial")
+        .style("font-size", 16)
+        .style("font-weight", "bold");
 
 const diameter = Math.ceil(screen.width*0.6);
     format = d3.format(",d");
-
+var longueur_graph = Math.ceil(screen.width*0.4);
 const svg = d3.select("body").append("svg")
-    .attr("width", 2*diameter)
+    .attr("width", 1.8*diameter)
     .attr("height", diameter+200)
     .attr("id", "svg");
 
@@ -68,23 +93,32 @@ const pack = d3.pack()
     .size([diameter - 4, diameter - 4])
     .padding(1.5);
 
+    d3.select("body").selectAll('input[name="brand"]').on("change", function() {
+            Prograss = ! Prograss;
+            console.log(Prograss);
+            remove_graph();
+            svg.selectAll("#legend").remove();
+    });
 d3.json("./final_1.json",function(error, root) {
-    var year = 1950;
-    var choice = 0;
+    var year = 2019;
+    var choice = 69;
     d3.select("#slider").on("input", function() {
-        var root_2 = root
+        var root_2 = root;
         year = Number(1949) + Number(this.value)
-        choice = this.value - 1
+        choice = this.value - 1;
         d3.select('#year').text(year);
         //console.log(root_2);
-        g.selectAll(".node").remove()
+        g.selectAll(".node").remove();
         draw_nodes(root_2,choice,year)
     });
-    draw_nodes(root,0,1950)
+    draw_nodes(root,69,2019)
 
 })
 
     function draw_nodes(data,choice,year){
+        // ici on remove en cas de changement d'années après compraison de graphes
+        remove_graph();
+        svg.selectAll("#legend").remove();
         var root_1 = d3.hierarchy(data)
             // ici on calcule l'emission par continent
             .sum(function(d) { if(d.data && d.data.annees[choice] == year) {return d.data.emissions[choice]} else return 0; })
@@ -109,29 +143,76 @@ d3.json("./final_1.json",function(error, root) {
                     }
                 }
             });
-        node
-            .on("mouseover",function (d) {
-                if(d.children) {
+
+        var data_comparaison = new Array();
+        var names = new Array();
+        var indices = new Array();
+       //console.log(root_1);
+        /*graphs_comparaison(root_1.children[0].children,root_1.children[1].children,2,2,
+            root_1.children[0].data.name,root_1.children[1].data.name);*/
+       node
+            .on("click",function (d) {
+                if(!Prograss) {
+                    console.log(data_comparaison.length);
+                    if (data_comparaison.length >= 5) {
+                        data_comparaison = [];
+                        names = [];
+                        indices = [];
+                        remove_graph();
+                        svg.selectAll("#legend").remove();
+
+                    }
+                    if (d.children) {
+                        //cici le cas de survoler le noeud monde
+                        if (d.data.name === "monde") {
+                            //draw_graph(d.children, d.data.name, 1,"monde")
+                            data_comparaison.push(d.children);
+                            names.push(d.data.name);
+                            indices.push(1)
+                        } else {
+                            // ici le cas de survoler un continent
+                            //draw_graph(d.children, d.data.name, 2,d.data.name)
+                            data_comparaison.push(d.children);
+                            names.push(d.data.name);
+                            indices.push(2)
+                        }
+                        // ici le cas de survoler un pays
+                    } else {
+                        // console.log(d)
+                        //draw_graph(d.data.data, d.data.pays, 3,d.parent.data.name)
+                        data_comparaison.push(d.data.data);
+                        names.push(d.data.pays);
+                        indices.push(3)
+                    }
+                    if (data_comparaison.length == 5) {
+                        graphs_comparaison(data_comparaison, names, indices);
+                    }
+                }
+            }).on("mouseout",function () {
+                if(Prograss){
+                    remove_graph();
+                }
+
+            //svg.selectAll("g").remove()
+        }).on("mouseover",function(d){
+            if(Prograss){
+                if (d.children) {
                     //cici le cas de survoler le noeud monde
-                    if(d.data.name === "monde") {
+                    if (d.data.name === "monde") {
                         draw_graph(d.children, d.data.name, 1,"monde")
-                    }else{
+
+                    } else {
                         // ici le cas de survoler un continent
                         draw_graph(d.children, d.data.name, 2,d.data.name)
                     }
                     // ici le cas de survoler un pays
-                }else{
-                   // console.log(d)
+                } else {
+                    // console.log(d)
                     draw_graph(d.data.data, d.data.pays, 3,d.parent.data.name)
+
                 }
-            }).on("mouseout",function () {
-                svg.selectAll("path").remove()
-                svg.select("#Xaxis").remove();
-                svg.select("#Yaxis").remove();
-                svg.select("#title").remove();
-                svg.select("#surface").remove();
-            //svg.selectAll("g").remove()
-        })
+            }
+        });
         // ici pour chaque noeud on rajoute un titre qui s'affiche quand on survole un noeud(pays ou continent)
         node.append("title")
             .text(function(d) {var res; if(d.data.name ){res = d.data.name}else{res = d.data.pays} return res+ "\n" + "co2 emission for " +year+" is " + format(d.value); });
@@ -145,56 +226,12 @@ d3.json("./final_1.json",function(error, root) {
 
     // une fonction qui sert a dessiner le line chart
     function draw_graph(data,title,indice,continent){
-        var data_object = new Array();
-        var total_emission = 0;
-        var longueur_graph = Math.ceil(screen.width*0.4);
-        switch (indice) {
-            case 1:
-                var sum ;
-                for(var compt=0;compt<100;compt++) {
-                    sum = 0;
-                    for (var i = 0; i < data.length; i++) {
-                        //data_object.push({"annee":data.annees[i],"emission":data.emissions[i]})
-                        for(var j=0;j<data[i].children.length;j++){
-                            if(data[i].children[j].data.data.emissions[compt]) {
-                                sum +=data[i].children[j].data.data.emissions[compt]
-                            }
-                        }
-                    }
-                    total_emission+= sum;
-                    data_object.push({"annee":1950+compt,"emission":sum})
-                }
-                break;
-            case 2:
-                var sum;
-                for(var compt=0;compt<100;compt++) {
-                    sum = 0;
-                    for (var i = 0; i < data.length; i++) {
-                        //data_object.push({"annee":data.annees[i],"emission":data.emissions[i]})
 
-                            if(data[i].data.data.emissions[compt]) {
-                                sum +=data[i].data.data.emissions[compt]
-                            }
-
-                    }
-                    total_emission+= sum;
-                    data_object.push({"annee":1950+compt,"emission":sum})
-                }
-                break;
-            case 3:
-                for(var i=0;i<data.annees.length;i++){
-                    data_object.push({"annee":data.annees[i],"emission":data.emissions[i]})
-                }
-                total_emission = d3.sum(data.emissions);
-                break;
-        }
-       /* //console.log(data_object);
-            for(var i=0;i<data.annees.length;i++){
-                data_object.push({"annee":data.annees[i],"emission":data.emissions[i]})
-            } */
+        var compute_data = compute_data_object(data,indice);
+        var total_emission = compute_data.total_emission;
+        var data_object = compute_data.data;
         var y = d3.scaleLinear().range([longueur_graph*1.2, longueur_graph*0.3]);
-        //var x = d3.scaleLinear().range([1100,1800])
-        //var x = d3.scaleBand().range([1100,1800]);
+
         var parseTime = d3.timeParse("%d-%b-%y");
         var x = d3.scaleTime()
             .domain([new Date(1950,0,0),new Date(2050,1,1)])
@@ -219,15 +256,11 @@ d3.json("./final_1.json",function(error, root) {
         //var tmp =d3.max(data.emissions, function(d) { return d; });
         //console.log(tmp);
         var z = ["#98abc5", "#a5de8f", "#7b6888", "#00FFFF", "#FFAF2B", "#d0743c", "#ff8c00","#b43122","#ffa268"];
-
+        //var color = d3.scale.category10();
         var continents = {"AFRIQUE":0,"EUROPE":1,"NORTH AMERICA":2,"ASIA":3,"AUSTRALIA":4,"SOUTH AMERICA":5,"OTHER":6,"CENTRAL AMERICA":7,"monde":8};
-        //console.log(continents[continent]);
-        //console.log(continent);
-        //console.log(z(3));
-        //console.log(x)
 
         var continent_number = continents[continent];
-        //console.log(continent_number,z(continent_number))
+        //console.log(continent_number);
         svg.append("path")
             .data([data_object])
             .attr("class", "area")
@@ -235,10 +268,11 @@ d3.json("./final_1.json",function(error, root) {
             .attr("fill", z[continent_number]);
 
         //console.log(z(continents[continent]));
-        // add the valueline path.
+        // ajouter le path de line
         svg.append("path")
             .data([data_object])
             .attr("class", "line")
+            .attr("stroke","#b43122")
             .attr("d", valueline);
 
         svg.append("g")
@@ -263,12 +297,128 @@ d3.json("./final_1.json",function(error, root) {
 
         svg.append("text")
             .attr("x", diameter*1.4)
-            .attr("y", longueur_graph *0.8)
+            .attr("y", longueur_graph *1.1)
             .attr("id","surface")
             .attr("text-anchor", "middle")
             .style("font-size", "18px")
             .style("font-weight", "bold")
             .text("Total emissions = "+ total_emission);
+    }
+
+    function graphs_comparaison(data_comp,names,indices){
+
+        var y = d3.scaleLinear().range([longueur_graph*1.2, longueur_graph*0.3]);
+
+        var parseTime = d3.timeParse("%d-%b-%y");
+        var x = d3.scaleTime()
+            .domain([new Date(1950,0,0),new Date(2050,1,1)])
+            .range([diameter+20, diameter*1.7]);
+
+        var xAxis = d3.axisBottom(x)
+            .tickFormat(d3.timeFormat("%Y"));
+
+        // definie la line
+        var valueline = d3.line()
+            .x(function(d) { return x(new Date(d.annee,0,0)); })
+            .y(function(d) { return y(d.emission); });
+        var max = 0;
+        var data_object;
+        var color = d3.scale.category10();
+        var data_ready =new  Array()
+        for(var i =0;i<data_comp.length;i++) {
+            data_object = compute_data_object(data_comp[i], indices[i]).data;
+            data_ready.push(data_object);
+            max = Math.max(max, d3.max(data_object, function (d) {
+                return d.emission;
+            }));
+        }
+        y.domain([0, max]);
+        for (var j=0;j<data_ready.length;j++){
+            svg.append("path")
+                .data([data_ready[j]])
+                .attr("class", "line")
+                .attr("stroke",color(j))
+                .attr("d", valueline);
+            svg.append("text")
+                .attr("x", diameter*1.2)
+                .attr("y", longueur_graph*0.3 +j*20)
+                .attr("id","legend")
+                .attr("class", "legend")
+                .attr("fill",color(j))
+                .text(names[j]);
+        }
+
+        svg.append("g")
+            .attr("id","Xaxis")
+            .attr("transform", "translate(0," + longueur_graph*1.2 + ")")
+            .call(xAxis);
+
+        // add the Y Axis
+        svg.append("g")
+            .attr("id","Yaxis")
+            .attr("transform", "translate(0" + (diameter+20)+ ")")
+            .call(d3.axisLeft(y));
+        // ici on ajoute le titre de line chart
+        svg.append("text")
+            .attr("x", diameter*1.4)
+            .attr("y", longueur_graph*0.2)
+            .attr("id","title")
+            .attr("text-anchor", "middle")
+            .style("font-size", "18px")
+            .style("font-weight", "bold")
+            .text(" Comparaison of co2 emission");
+    }
+    function compute_data_object(data,indice) {
+        var data_object = new Array();
+        var total_emission = 0;
+        switch (indice) {
+        case 1:
+            var sum;
+            for (var compt = 0; compt < 100; compt++) {
+                sum = 0;
+                for (var i = 0; i < data.length; i++) {
+                    //data_object.push({"annee":data.annees[i],"emission":data.emissions[i]})
+                    for (var j = 0; j < data[i].children.length; j++) {
+                        if (data[i].children[j].data.data.emissions[compt]) {
+                            sum += data[i].children[j].data.data.emissions[compt]
+                        }
+                    }
+                }
+                total_emission += sum;
+                data_object.push({"annee": 1950 + compt, "emission": sum})
+            }
+            break;
+        case 2:
+            var sum;
+            for (var compt = 0; compt < 100; compt++) {
+                sum = 0;
+                for (var i = 0; i < data.length; i++) {
+                    //data_object.push({"annee":data.annees[i],"emission":data.emissions[i]})
+
+                    if (data[i].data.data.emissions[compt]) {
+                        sum += data[i].data.data.emissions[compt]
+                    }
+
+                }
+                total_emission += sum;
+                data_object.push({"annee": 1950 + compt, "emission": sum})
+            }
+            break;
+        case 3:
+            for (var i = 0; i < data.annees.length; i++) {
+                data_object.push({"annee": data.annees[i], "emission": data.emissions[i]})
+            }
+            total_emission = d3.sum(data.emissions);
+            break;
+    }
+    return {"data": data_object, "total_emission": total_emission};
+}
+    function remove_graph() {
+        svg.selectAll("path").remove()
+        svg.select("#Xaxis").remove();
+        svg.select("#Yaxis").remove();
+        svg.select("#title").remove();
+        svg.select("#surface").remove();
     }
 </script>
 </body>
