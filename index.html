@@ -5,6 +5,7 @@
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://unpkg.com/d3-simple-slider/build/d3-simple-slider.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
     <title>
         DataVis Project
     </title>
@@ -22,7 +23,7 @@
 
             fill-opacity: .25;
             stroke: rgb(31, 119, 180);
-            stroke-width: 1px;
+            stroke-width: 2px;
         }
 
         .leaf circle {
@@ -45,11 +46,30 @@
             fill:none;
             stroke-width: 3px;
         }
-        /*
-        .area {
-            fill: #a5de8f;
+        .country-name {
+            margin: 0 !important;
         }
-        */
+
+        .key-dot {
+            display: inline-block;
+            height: 10px;
+            margin-right: .5em;
+            width: 10px;
+        }
+
+        .legend {
+            margin-right:20px;
+        }
+
+        .big { background: #b43122;
+                margin-left: 48%;
+                }
+        .small { background: #1F77B4;
+                 margin-left: 48%;
+        }
+
+
+
         #graph,#number_graph{
             visibility: hidden;
         }
@@ -70,6 +90,10 @@
     <input id="number_graph" type="range" value="1" min="1" max="10" step="1" width="8%" />
     <span id="graph" >1 graph comparaison</span>
 </div>
+<div class="legend1">
+    <div class="legend1"> <p class="country-name"><span class="key-dot big"></span>Big Emission</p> </div>
+    <div class="legend1"> <p class="country-name"><span class="key-dot small"></span>Small and medium Emission</p> </div>
+</div>
 <script>
     var Prograss = true;
     var brands = ['Progress Graph', 'Comparaison Graph'];
@@ -78,8 +102,6 @@
         d3.select("#graph").text(this.value + " graphs comparaison");
         limit = Number(this.value);
         remove_graph();
-        svg.selectAll("#legend").remove();
-        //draw_nodes(root_2,choice,year,limit);
     })
     var radios =
         d3.select('.panel.left').selectAll('input[name="brand"]').data(brands);
@@ -88,7 +110,7 @@
         .append("text")
         .text(function(d) { return d; })
         .style("font-family", "Arial")
-        .style("font-size", 16)
+        .style("font-size", "16px")
         .style("font-weight", "bold");
 
 const diameter = Math.ceil(window.innerWidth*0.6);
@@ -100,10 +122,9 @@ const svg = d3.select("body").append("svg")
     .attr("id", "svg");
 
 const g = svg.append("g").attr("transform", "translate(2,2)");
-
 const pack = d3.pack()
     .size([diameter - 4, diameter - 4])
-    .padding(1.5);
+    .padding(1.8);
 
     d3.select("body").selectAll('input[name="brand"]').on("change", function() {
             Prograss = ! Prograss;
@@ -116,7 +137,7 @@ const pack = d3.pack()
             }
             console.log(Prograss);
             remove_graph();
-            svg.selectAll("#legend").remove();
+            //svg.selectAll("#legend").remove();
     });
 d3.json("./final_1.json",function(error, root) {
     var year = 2019;
@@ -138,7 +159,7 @@ d3.json("./final_1.json",function(error, root) {
     function draw_nodes(data,choice,year){
         // ici on remove en cas de changement d'années après compraison de graphes
         remove_graph();
-        svg.selectAll("#legend").remove();
+        //svg.selectAll("#legend").remove();
         var root_1 = d3.hierarchy(data)
             // ici on calcule l'emission par continent
             .sum(function(d) { if(d.data && d.data.annees[choice] == year) {return d.data.emissions[choice]} else return 0; })
@@ -155,7 +176,8 @@ d3.json("./final_1.json",function(error, root) {
                 if(d.children){
                     return "#1F77B4";
                 }else{
-                    //console.log(d);
+                    // ici si l'emission de co2 d'un pays est superieure a 0.3 de l'emission par son continent
+                    // on le colore en rouge (danger) sinon en bleu
                     if((d.value/d.parent.value)>=0.3){
                         return "#b43122";
                     }else{
@@ -167,9 +189,7 @@ d3.json("./final_1.json",function(error, root) {
         var data_comparaison = new Array();
         var names = new Array();
         var indices = new Array();
-       //console.log(root_1);
-        /*graphs_comparaison(root_1.children[0].children,root_1.children[1].children,2,2,
-            root_1.children[0].data.name,root_1.children[1].data.name);*/
+
        node
             .on("click",function (d) {
                 if(!Prograss) {
@@ -179,27 +199,23 @@ d3.json("./final_1.json",function(error, root) {
                         names = [];
                         indices = [];
                         remove_graph();
-                        svg.selectAll("#legend").remove();
-
                     }
                     if (d.children) {
-                        //cici le cas de survoler le noeud monde
+                        //ici le cas de survoler le noeud monde
                         if (d.data.name === "monde") {
                             //draw_graph(d.children, d.data.name, 1,"monde")
                             data_comparaison.push(d.children);
                             names.push(d.data.name);
                             indices.push(1)
                         } else {
-                            // ici le cas de survoler un continent
-                            //draw_graph(d.children, d.data.name, 2,d.data.name)
+                            // ici le cas de selectionner d'un continent
                             data_comparaison.push(d.children);
                             names.push(d.data.name);
                             indices.push(2)
                         }
-                        // ici le cas de survoler un pays
+                        // ici le cas de selection  d'un pays
                     } else {
-                        // console.log(d)
-                        //draw_graph(d.data.data, d.data.pays, 3,d.parent.data.name)
+
                         data_comparaison.push(d.data.data);
                         names.push(d.data.pays);
                         indices.push(3)
@@ -217,7 +233,7 @@ d3.json("./final_1.json",function(error, root) {
         }).on("mouseover",function(d){
             if(Prograss){
                 if (d.children) {
-                    //cici le cas de survoler le noeud monde
+                    //ici le cas de survoler le noeud monde
                     if (d.data.name === "monde") {
                         draw_graph(d.children, d.data.name, 1,"monde")
 
@@ -271,10 +287,7 @@ d3.json("./final_1.json",function(error, root) {
             .y0(longueur_graph*1.2)
             .y1(function(d) { return y(d.emission); });
 
-       //x.domain(d3.extent(data_object, function(d) { return new Date(d.annee,0,0); }));
        y.domain([0, d3.max(data_object, function(d) { return d.emission; })]);
-        //var tmp =d3.max(data.emissions, function(d) { return d; });
-        //console.log(tmp);
         var z = ["#98abc5", "#a5de8f", "#7b6888", "#00FFFF", "#FFAF2B", "#d0743c", "#ff8c00","#b43122","#ffa268"];
         //var color = d3.scale.category10();
         var continents = {"AFRIQUE":0,"EUROPE":1,"NORTH AMERICA":2,"ASIA":3,"AUSTRALIA":4,"SOUTH AMERICA":5,"OTHER":6,"CENTRAL AMERICA":7,"monde":8};
@@ -291,29 +304,11 @@ d3.json("./final_1.json",function(error, root) {
         // ajouter le path de line
         svg.append("path")
             .data([data_object])
-            .attr("class", "line")
+            .attr("class", "line")   //
             .attr("stroke","#b43122")
             .attr("d", valueline);
 
-        svg.append("g")
-            .attr("id","Xaxis")
-            .attr("transform", "translate(0," + longueur_graph*1.2 + ")")
-            .call(xAxis);
-
-        // add the Y Axis
-        svg.append("g")
-            .attr("id","Yaxis")
-            .attr("transform", "translate(0" + (diameter+20)+ ")")
-            .call(d3.axisLeft(y));
-        // ici on ajoute le titre de line chart
-        svg.append("text")
-            .attr("x", diameter*1.4)
-            .attr("y", longueur_graph*0.2)
-            .attr("id","title")
-            .attr("text-anchor", "middle")
-            .style("font-size", "18px")
-            .style("font-weight", "bold")
-            .text(title+ " Co2 emissions line chart");
+        line_chart(xAxis,y,title+" Co2 emission line chart");
 
         svg.append("text")
             .attr("x", diameter*1.4)
@@ -344,7 +339,7 @@ d3.json("./final_1.json",function(error, root) {
         var max = 0;
         var data_object;
         var color = d3.scale.category10();
-        var data_ready =new  Array()
+        var data_ready =new  Array();
         for(var i =0;i<data_comp.length;i++) {
             data_object = compute_data_object(data_comp[i], indices[i]).data;
             data_ready.push(data_object);
@@ -359,34 +354,16 @@ d3.json("./final_1.json",function(error, root) {
                 .attr("class", "line")
                 .attr("stroke",color(j))
                 .attr("d", valueline);
+
             svg.append("text")
                 .attr("x", diameter*1.2)
-                .attr("y", longueur_graph*0.3 +j*20)
+                .attr("y", longueur_graph*0.3 +j*15)
                 .attr("id","legend")
                 .attr("class", "legend")
                 .attr("fill",color(j))
                 .text(names[j]);
         }
-
-        svg.append("g")
-            .attr("id","Xaxis")
-            .attr("transform", "translate(0," + longueur_graph*1.2 + ")")
-            .call(xAxis);
-
-        // add the Y Axis
-        svg.append("g")
-            .attr("id","Yaxis")
-            .attr("transform", "translate(0" + (diameter+20)+ ")")
-            .call(d3.axisLeft(y));
-        // ici on ajoute le titre de line chart
-        svg.append("text")
-            .attr("x", diameter*1.4)
-            .attr("y", longueur_graph*0.2)
-            .attr("id","title")
-            .attr("text-anchor", "middle")
-            .style("font-size", "18px")
-            .style("font-weight", "bold")
-            .text(" Comparaison of co2 emission");
+        line_chart(xAxis,y," Comparaison of Co2 emission");
     }
     function compute_data_object(data,indice) {
         var data_object = new Array();
@@ -418,7 +395,6 @@ d3.json("./final_1.json",function(error, root) {
                     if (data[i].data.data.emissions[compt]) {
                         sum += data[i].data.data.emissions[compt]
                     }
-
                 }
                 total_emission += sum;
                 data_object.push({"annee": 1950 + compt, "emission": sum})
@@ -433,12 +409,38 @@ d3.json("./final_1.json",function(error, root) {
     }
     return {"data": data_object, "total_emission": total_emission};
 }
+    // une fonction de suppression des axes et de legend du svg
     function remove_graph() {
         svg.selectAll("path").remove()
         svg.select("#Xaxis").remove();
         svg.select("#Yaxis").remove();
         svg.select("#title").remove();
         svg.select("#surface").remove();
+        svg.selectAll("#legend").remove();
+
+    }
+    function line_chart(xAxis,y,message){
+        // add x Axis
+        svg.append("g")
+            .attr("id","Xaxis")   //
+            .attr("transform", "translate(0," + longueur_graph*1.2 + ")")
+            .call(xAxis);
+
+        // add the Y Axis
+        svg.append("g")
+            .attr("id","Yaxis")
+            .attr("transform", "translate(0" + (diameter+20)+ ")")
+            .call(d3.axisLeft(y));
+
+        // ici on ajoute le titre de line chart
+        svg.append("text")
+            .attr("x", diameter*1.4)
+            .attr("y", longueur_graph*0.2)
+            .attr("id","title")
+            .attr("text-anchor", "middle")
+            .style("font-size", "18px")
+            .style("font-weight", "bold")
+            .text(message); //title+ " Co2 emissions line chart"
     }
 </script>
 </body>
