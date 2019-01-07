@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://d3js.org/d3.v3.min.js"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://unpkg.com/d3-simple-slider/build/d3-simple-slider.js"></script>
     <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <script data-require="d3@3.5.3" data-semver="3.5.3" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
     <title>
         DataVis Project
     </title>
@@ -44,7 +45,7 @@
 
         .line {
             fill:none;
-            stroke-width: 3px;
+            stroke-width: 1.5px;
         }
         .country-name {
             margin: 0 !important;
@@ -55,6 +56,12 @@
             height: 10px;
             margin-right: .5em;
             width: 10px;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
         }
 
         .legend {
@@ -76,6 +83,7 @@
     </style>
 </head>
 <body>
+<h2 style="text-align: center"> Proportion de co2 par pays avec prédiction des températures  et de de l'émission de co2 future </h2>
 <div>
     <input id="slider" type="range" value="69" min="1" max="101" step="1" width="200" />
     <span id="year">2019</span>
@@ -98,10 +106,17 @@
     var Prograss = true;
     var brands = ['Progress Graph', 'Comparaison Graph'];
     var limit = 1;
+    var data_comparaison = new Array();
+    var names = new Array();
+    var indices = new Array();
     d3.select("#number_graph").on("input",function () {
         d3.select("#graph").text(this.value + " graphs comparaison");
         limit = Number(this.value);
+        data_comparaison = [];
+        names = [];
+        indices = [];
         remove_graph();
+
     })
     var radios =
         d3.select('.panel.left').selectAll('input[name="brand"]').data(brands);
@@ -186,9 +201,7 @@ d3.json("./final_1.json",function(error, root) {
                 }
             });
 
-        var data_comparaison = new Array();
-        var names = new Array();
-        var indices = new Array();
+
 
        node
             .on("click",function (d) {
@@ -251,7 +264,7 @@ d3.json("./final_1.json",function(error, root) {
         });
         // ici pour chaque noeud on rajoute un titre qui s'affiche quand on survole un noeud(pays ou continent)
         node.append("title")
-            .text(function(d) {var res; if(d.data.name ){res = d.data.name}else{res = d.data.pays} return res+ "\n" + "co2 emission for " +year+" is " + format(d.value); });
+            .text(function(d) {var res; if(d.data.name ){res = d.data.name}else{res = d.data.pays} return res+ "\n" + "co2 emission for " +year+" is " + format(d.value) +" µg/m³"; });
         node.filter(function(d) { return !d.children; })
             .append("text")
             .attr("dy", "0.3em")
@@ -308,7 +321,7 @@ d3.json("./final_1.json",function(error, root) {
             .attr("stroke","#b43122")
             .attr("d", valueline);
 
-        line_chart(xAxis,y,title+" Co2 emission line chart");
+        line_chart(xAxis,y,title+" Co2 emission line chart (µg/m³)");
 
         svg.append("text")
             .attr("x", diameter*1.4)
@@ -317,7 +330,8 @@ d3.json("./final_1.json",function(error, root) {
             .attr("text-anchor", "middle")
             .style("font-size", "18px")
             .style("font-weight", "bold")
-            .text("Total emissions = "+ total_emission);
+            .text("Total emissions = "+ total_emission +" µg/m³");
+
     }
 
     function graphs_comparaison(data_comp,names,indices){
@@ -333,22 +347,23 @@ d3.json("./final_1.json",function(error, root) {
             .tickFormat(d3.timeFormat("%Y"));
 
         // definie la line
-        var valueline = d3.line()
+        var valueline = d3.svg.line()
             .x(function(d) { return x(new Date(d.annee,0,0)); })
             .y(function(d) { return y(d.emission); });
         var max = 0;
         var data_object;
         var color = d3.scale.category10();
+        color.domain(names);
         var data_ready =new  Array();
         for(var i =0;i<data_comp.length;i++) {
             data_object = compute_data_object(data_comp[i], indices[i]).data;
-            data_ready.push(data_object);
+            data_ready.push({"name":names[i],"values":data_object});
             max = Math.max(max, d3.max(data_object, function (d) {
                 return d.emission;
             }));
         }
         y.domain([0, max]);
-        for (var j=0;j<data_ready.length;j++){
+        /*for (var j=0;j<data_ready.length;j++){
             svg.append("path")
                 .data([data_ready[j]])
                 .attr("class", "line")
@@ -363,8 +378,145 @@ d3.json("./final_1.json",function(error, root) {
                 .attr("fill",color(j))
                 .text(names[j]);
         }
-        line_chart(xAxis,y," Comparaison of Co2 emission");
-    }
+        */
+
+        // ici on dessine les axes de line chart
+        line_chart(xAxis,y," Comparaison of Co2 emission (µg/m³)");
+
+            // ici c'est l'etape de dessiner les graphes de comparaison avec un petit circle et une bar
+            // qui afficher le detail de l'emission
+
+        var city = svg.selectAll(".city")
+            .data(data_ready)
+            .enter().append("g")
+            .attr("class", "city");
+
+        city.append("path")
+            .attr("class", "line")
+            .attr("d", function(d) {
+                return valueline(d.values);
+            })
+            .style("stroke", function(d) {
+                return color(d.name);
+            });
+
+        city.append("text")
+            .datum(function(d) {
+                return {
+                    name: d.name,
+                    value: d.values[0]
+                };
+            })
+            .attr("x", diameter*1.2)
+            .attr("y", function (d,i) {
+                return longueur_graph*0.3 +i*12;
+            })
+            .attr("fill",function (d) {
+                console.log(color(d.name));
+                return color(d.name)
+            })
+            .attr("id","legend")
+            .text(function(d) {
+                return d.name;
+            });
+
+
+
+        var mouseG = svg.append("g")
+            .attr("class", "mouse-over-effects");
+
+        mouseG.append("path") // this is the black vertical line to follow mouse
+            .attr("class", "mouse-line")
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
+
+        var lines = document.getElementsByClassName('line');
+        //console.log(lines)
+        var mousePerLine = mouseG.selectAll('.mouse-per-line')
+            .data(data_ready)
+            .enter()
+            .append("g")
+            .attr("class", "mouse-per-line");
+
+        mousePerLine.append("circle")
+            .attr("r", 10)
+            .attr('class',"circle-mouse")
+            .style("stroke", function (d) {
+                return color(d.name);
+            })
+            .style("fill", "none")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
+
+        mousePerLine.append("text")
+            .attr("transform", "translate(10,3)");
+
+        mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+            .attr('width', 0.7*diameter-20) // can't catch mouse events on a g element
+            .attr('height', 0.9*longueur_graph)
+            .attr("x",diameter+20)
+            .attr("y",longueur_graph*0.3)
+            .attr('fill', 'none')
+            .attr('pointer-events', 'all')
+            .on('mouseout', function() { // on mouse out hide line, circles and text
+                d3.select(".mouse-line")
+                    .style("opacity", "0");
+                d3.selectAll(".mouse-per-line circle")
+                    .style("opacity", "0");
+                d3.selectAll(".mouse-per-line text")
+                    .style("opacity", "0");
+            })
+            .on('mouseover', function() { // on mouse in show line, circles and text
+                d3.select(".mouse-line")
+                    .style("opacity", "1");
+                d3.selectAll(".mouse-per-line circle")
+                    .style("opacity", "1");
+                d3.selectAll(".mouse-per-line text")
+                    .style("opacity", "1");
+            })
+            .on('mousemove', function() { // mouse moving over canvas
+                var mouse = d3.mouse(this);
+                d3.select(".mouse-line")
+                    .attr("d", function() {
+                        var d = "M" + mouse[0] + "," + (1.2*longueur_graph);
+                        d += " " + mouse[0] + "," + (0.3*longueur_graph);
+                        //console.log(d,mouse[0]);
+                        return d;
+                    });
+                d3.selectAll(".mouse-per-line")
+                    .attr("transform", function(d, i) {
+                        //console.log(lines[i].getTotalLength());
+                        var beginning = 0;
+                            if(lines[i]) {
+                                var end = lines[i].getTotalLength();
+
+                                var target;
+                                //console.log(lines[i].getTotalLength());
+                                //console.log(lines.length)
+                                while (true) {
+                                    //console.log(beginning,end);
+                                    target = Math.floor((beginning + end) / 2);
+                                    //console.log("target is : " +target);
+
+                                    pos = lines[i].getPointAtLength(target);
+
+                                    //console.log(pos);
+                                    if ((target === end || target === beginning) && pos.x !== mouse[0]) {
+                                        break;
+                                    }
+                                    if (pos.x < mouse[0]) beginning = target;
+                                    else if (pos.x > mouse[0]) end = target;
+                                    else break;
+                                }
+
+                                d3.select(this).select('text')
+                                    .text(y.invert(pos.y).toFixed(2));
+                                return "translate(" + mouse[0] + "," + pos.y + ")";
+                            }
+                    });
+                });
+            }
     function compute_data_object(data,indice) {
         var data_object = new Array();
         var total_emission = 0;
@@ -411,13 +563,18 @@ d3.json("./final_1.json",function(error, root) {
 }
     // une fonction de suppression des axes et de legend du svg
     function remove_graph() {
-        svg.selectAll("path").remove()
+        svg.selectAll("path").remove();
         svg.select("#Xaxis").remove();
         svg.select("#Yaxis").remove();
         svg.select("#title").remove();
         svg.select("#surface").remove();
         svg.selectAll("#legend").remove();
-
+        d3.selectAll("circle-mouse").remove();
+        d3.selectAll(".city").remove();
+        d3.selectAll("line").remove();
+        svg.selectAll("rect").remove();
+        svg.selectAll("mouse-per-ligne").remove();
+        //svg.selectAll("#mouse-line").remove();
     }
     function line_chart(xAxis,y,message){
         // add x Axis
@@ -430,6 +587,8 @@ d3.json("./final_1.json",function(error, root) {
         svg.append("g")
             .attr("id","Yaxis")
             .attr("transform", "translate(0" + (diameter+20)+ ")")
+            .attr("y", 6)
+            .attr("dy", ".71em")
             .call(d3.axisLeft(y));
 
         // ici on ajoute le titre de line chart
@@ -438,7 +597,7 @@ d3.json("./final_1.json",function(error, root) {
             .attr("y", longueur_graph*0.2)
             .attr("id","title")
             .attr("text-anchor", "middle")
-            .style("font-size", "18px")
+            .style("font-size", "16px")
             .style("font-weight", "bold")
             .text(message); //title+ " Co2 emissions line chart"
     }
