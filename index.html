@@ -45,7 +45,6 @@
 
         .line {
             fill:none;
-            stroke-width: 1.5px;
         }
         .country-name {
             margin: 0 !important;
@@ -319,6 +318,7 @@ d3.json("./final_1.json",function(error, root) {
             .data([data_object])
             .attr("class", "line")   //
             .attr("stroke","#b43122")
+            .style("stroke-width","3px")
             .attr("d", valueline);
 
         line_chart(xAxis,y,title+" Co2 emission line chart (µg/m³)");
@@ -335,7 +335,6 @@ d3.json("./final_1.json",function(error, root) {
     }
 
     function graphs_comparaison(data_comp,names,indices){
-
         var y = d3.scaleLinear().range([longueur_graph*1.2, longueur_graph*0.3]);
 
         var parseTime = d3.timeParse("%d-%b-%y");
@@ -398,7 +397,7 @@ d3.json("./final_1.json",function(error, root) {
             })
             .style("stroke", function(d) {
                 return color(d.name);
-            });
+            }).style("stroke-width","1px");
 
         city.append("text")
             .datum(function(d) {
@@ -423,7 +422,8 @@ d3.json("./final_1.json",function(error, root) {
 
 
         var mouseG = svg.append("g")
-            .attr("class", "mouse-over-effects");
+            .attr("class", "mouse-over-effects")
+            .attr("id","mouse-effects");
 
         mouseG.append("path") // this is the black vertical line to follow mouse
             .attr("class", "mouse-line")
@@ -569,11 +569,14 @@ d3.json("./final_1.json",function(error, root) {
         svg.select("#title").remove();
         svg.select("#surface").remove();
         svg.selectAll("#legend").remove();
-        d3.selectAll("circle-mouse").remove();
+        //svg.selectAll("circle-mouse").remove();
         d3.selectAll(".city").remove();
         d3.selectAll("line").remove();
         svg.selectAll("rect").remove();
-        svg.selectAll("mouse-per-ligne").remove();
+        svg.selectAll("g#mouse-effects.mouse-over-effects").remove();
+        //d3.selectAll(".mouse-per-line text").remove();
+        //d3.selectAll(".mouse-per-line circle").remove();
+
         //svg.selectAll("#mouse-line").remove();
     }
     function line_chart(xAxis,y,message){
