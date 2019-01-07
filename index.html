@@ -23,7 +23,7 @@
         circle {
 
             fill-opacity: .25;
-            stroke: rgb(31, 119, 180);
+            stroke: rgb(15, 5, 255);
             stroke-width: 2px;
         }
 
@@ -75,7 +75,9 @@
         }
 
 
+        #Xaxis,#Yaxis {
 
+        }
         #graph,#number_graph{
             visibility: hidden;
         }
@@ -572,12 +574,8 @@ d3.json("./final_1.json",function(error, root) {
         //svg.selectAll("circle-mouse").remove();
         d3.selectAll(".city").remove();
         d3.selectAll("line").remove();
-        svg.selectAll("rect").remove();
+        //svg.selectAll("rect").remove();
         svg.selectAll("g#mouse-effects.mouse-over-effects").remove();
-        //d3.selectAll(".mouse-per-line text").remove();
-        //d3.selectAll(".mouse-per-line circle").remove();
-
-        //svg.selectAll("#mouse-line").remove();
     }
     function line_chart(xAxis,y,message){
         // add x Axis
