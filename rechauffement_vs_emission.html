@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+    body {
+        font: 10px sans-serif;
+        background-color: gray;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+
+    .x.axis path {
+        /*display: none;*/
+    }
+
+    .line {
+        fill: none;
+        stroke: steelblue;
+        stroke-width: 3px;
+    }
+    svg{
+        background-color: #f4f3ff;
+        align-content: center;
+    }
+</style>
+</head>
+<body>
+<h2 style="text-align: center"> Emission vs Réchauffement climatique </h2>
+
+<script data-require="d3@3.5.3" data-semver="3.5.3" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
+<script>
+    var margin = {
+            top: 20,
+            right: 100,
+            bottom: 30,
+            left: 100
+        },
+        width = window.innerWidth- margin.left - margin.right,
+        height = window.innerHeight*0.75- margin.top - margin.bottom;
+
+    var x = d3.scale.linear()
+        .range([0, width]);
+
+    var y = d3.scale.linear()
+        .range([height*0.5, 0]);
+
+    var y1 = d3.scale.linear().range([height,height*0.52]);
+    var color = d3.scale.category10();
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    var yAxis_ = d3.svg.axis()
+        .scale(y1)
+        .orient("left");
+
+
+    var line = d3.svg.line()
+    //.interpolate("basis")
+        .x(function(d) {
+            return x(d.year);
+        })
+        .y(function(d) {
+            return y(d.mean_temp);
+        });
+    var line_ = d3.svg.line()
+    //.interpolate("basis")
+        .x(function(d) {
+            return x(d.year);
+        })
+        .y(function(d) {
+            return y1(d.mean_temp);
+        });
+
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    d3.csv("rechauffement_clim.csv", function(error, data) {
+        if (error) throw error;
+       // mean changements c'est la moyenne de changement pour chaque année par rapport a GCAG et GISTEMP
+       var table = ["GCAG","GISTEMP","emission"];
+        var means_changements = table.map(function (name) {
+            return{
+                name : name,
+                values:data.map(function (d) {
+                    //console.log(d);
+                    return{
+                        year:Number(d.Year),
+                        mean_temp : Number(d[name])
+                    }
+                })
+            }
+        });
+
+        x.domain([1950,2050]);
+
+        y.domain([
+           -1.5,1.5
+        ]);
+        y1.domain([2000000,11300030]);
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Annual Mean changement with celcuis");
+
+        svg.append("g")
+            .attr("class", "y axis_")
+            .call(yAxis_)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Annual Mean changement with celcuis");
+
+
+        var mean_changement = svg.selectAll(".mean_changement")
+            .data(means_changements)
+            .enter().append("g")
+            .attr("class", "mean_changement");
+
+
+        mean_changement.append("path")
+            .attr("class", "line")
+            .attr("d", function(d) {
+                if(d.name === "emission") {
+                    return line_(d.values);
+                }else{
+                    return line(d.values);
+                }
+            })
+            .style("stroke", function(d) {
+                return color(d.name);
+            });
+
+        mean_changement.append("text")
+            .datum(function(d) {
+                return {
+                    name: d.name,
+                    value: d.values[0]
+                };
+            })
+            .attr("x", 40)
+            .attr("y", function (d,i) {
+                return i*25;
+            })
+            .attr("fill",function (d) {
+                console.log(color(d.name));
+                return color(d.name)
+            })
+            .attr("id","legend")
+            .text(function(d) {
+                return d.name;
+            });
+
+        var mouseG = svg.append("g")
+            .attr("class", "mouse-over-effects");
+
+        mouseG.append("path") // this is the black vertical line to follow mouse
+            .attr("class", "mouse-line")
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
+
+        var lines = document.getElementsByClassName('line');
+
+        var mousePerLine = mouseG.selectAll('.mouse-per-line')
+            .data(means_changements)
+            .enter()
+            .append("g")
+            .attr("class", "mouse-per-line");
+
+        mousePerLine.append("circle")
+            .attr("r", 5)
+            .style("stroke", function(d) {
+                return color(d.name);
+            })
+            .style("fill", "none")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
+
+        mousePerLine.append("text")
+            .attr("transform", function (d,i) {
+                return "translate(" +14+","+(i*8)+")";
+            });
+
+        mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+            .attr('width', width) // can't catch mouse events on a g element
+            .attr('height', height)
+            .attr('fill', 'none')
+            .attr('pointer-events', 'all')
+            .on('mouseout', function() { // on mouse out hide line, circles and text
+                d3.select(".mouse-line")
+                    .style("opacity", "0");
+                d3.selectAll(".mouse-per-line circle")
+                    .style("opacity", "0");
+                d3.selectAll(".mouse-per-line text")
+                    .style("opacity", "0");
+            })
+            .on('mouseover', function() { // on mouse in show line, circles and text
+                d3.select(".mouse-line")
+                    .style("opacity", "1");
+                d3.selectAll(".mouse-per-line circle")
+                    .style("opacity", "1");
+                d3.selectAll(".mouse-per-line text")
+                    .style("opacity", "1");
+            })
+            .on('mousemove', function() { // mouse moving over canvas
+                var mouse = d3.mouse(this);
+                d3.select(".mouse-line")
+                    .attr("d", function() {
+                        var d = "M" + mouse[0] + "," + height;
+                        d += " " + mouse[0] + "," + 0;
+                        return d;
+                    });
+                d3.selectAll(".mouse-per-line")
+                    .attr("transform", function(d, i) {
+
+                        var beginning = 0,
+                            end = lines[i].getTotalLength(),
+                            target = null;
+
+                        while (true) {
+                            target = Math.floor((beginning + end) / 2);
+                            pos = lines[i].getPointAtLength(target);
+                            if ((target === end || target === beginning) && pos.x !== mouse[0]) {
+                                break;
+                            }
+                            if (pos.x < mouse[0]) beginning = target;
+                            else if (pos.x > mouse[0]) end = target;
+                            else break;
+                        }
+
+                        d3.select(this).select('text')
+                            .text(function (){ if(d.name === "emission") return y1.invert(pos.y).toFixed(2);else return y.invert(pos.y).toFixed(2)});
+
+                        return "translate(" + mouse[0] + "," + pos.y + ")";
+                    });
+            });
+
+
+
+
+    });
+
+</script>
+<h4 style="text-align: center"> This is the lines chart of world co2 emission vs mean Temperature change</h4>
