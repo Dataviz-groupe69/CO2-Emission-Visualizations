@@ -32,8 +32,11 @@
 <body>
 <h2 style="text-align: center"> Emission vs Réchauffement climatique </h2>
 
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://unpkg.com/d3-simple-slider/build/d3-simple-slider.js"></script>
+<script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
 <script data-require="d3@3.5.3" data-semver="3.5.3" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
-<script>
+<script src="https://d3js.org/d3.v4.min.js"></script><script>
     var margin = {
             top: 20,
             right: 100,
@@ -43,32 +46,30 @@
         width = window.innerWidth- margin.left - margin.right,
         height = window.innerHeight*0.75- margin.top - margin.bottom;
 
-    var x = d3.scale.linear()
+    var parseTime = d3.timeParse("%d-%b-%y");
+    var x = d3.scaleTime()
+        .domain([new Date(1950,0,0),new Date(2050,1,1)])
         .range([0, width]);
 
-    var y = d3.scale.linear()
+    var y = d3.scaleLinear()
         .range([height*0.5, 0]);
 
-    var y1 = d3.scale.linear().range([height,height*0.52]);
+    var y1 = d3.scaleLinear().range([height,height*0.52]);
     var color = d3.scale.category10();
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
+    var xAxis = d3.axisBottom(x)
+        .tickFormat(d3.timeFormat("%Y"));
 
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left");
+    var yAxis = d3.axisLeft(y);
 
-    var yAxis_ = d3.svg.axis()
-        .scale(y1)
-        .orient("left");
+    var yAxis_ = d3.axisLeft(y1);
+
 
 
     var line = d3.svg.line()
     //.interpolate("basis")
         .x(function(d) {
-            return x(d.year);
+            return x(new Date(d.year,0,0));
         })
         .y(function(d) {
             return y(d.mean_temp);
@@ -76,7 +77,7 @@
     var line_ = d3.svg.line()
     //.interpolate("basis")
         .x(function(d) {
-            return x(d.year);
+            return x(new Date(d.year,0,0));
         })
         .y(function(d) {
             return y1(d.mean_temp);
@@ -106,7 +107,7 @@
             }
         });
 
-        x.domain([1950,2050]);
+        //x.domain([1950,2050]);
 
         y.domain([
            -1.5,1.5
@@ -130,12 +131,7 @@
         svg.append("g")
             .attr("class", "y axis_")
             .call(yAxis_)
-            .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text("Annual Mean changement with celcuis");
+
 
 
         var mean_changement = svg.selectAll(".mean_changement")
