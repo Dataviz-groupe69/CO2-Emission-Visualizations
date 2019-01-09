@@ -21,7 +21,10 @@
     .line {
         fill: none;
         stroke: steelblue;
-        stroke-width: 3px;
+        stroke-width: 2px;
+    }
+    .accueil{
+        margin-left: 90%;
     }
     svg{
         background-color: #f4f3ff;
@@ -30,8 +33,10 @@
 </style>
 </head>
 <body>
-<h2 style="text-align: center"> Emission vs Réchauffement climatique </h2>
-
+<h2 style="text-align: center"> Co2 Emission (µg/m³) vs Average Global mean Temperature anomalies ( en C°)</h2>
+<div class="accueil">
+    <button onclick="window.location='./index.html'">Accueil </button>
+</div>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script src="https://unpkg.com/d3-simple-slider/build/d3-simple-slider.js"></script>
 <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
@@ -170,18 +175,22 @@
             })
             .attr("id","legend")
             .text(function(d) {
-                return d.name;
+
+                return d.name == "emission" ?"Co2 Emission":d.name;
             });
 
         var mouseG = svg.append("g")
             .attr("class", "mouse-over-effects");
 
-        mouseG.append("path") // this is the black vertical line to follow mouse
+
+        // ici c'est la bar verticale qui s'affiche
+        mouseG.append("path")
             .attr("class", "mouse-line")
             .style("stroke", "black")
             .style("stroke-width", "1px")
             .style("opacity", "0");
 
+        // ici on recupère tous les graphes de line chart
         var lines = document.getElementsByClassName('line');
 
         var mousePerLine = mouseG.selectAll('.mouse-per-line')
@@ -191,7 +200,7 @@
             .attr("class", "mouse-per-line");
 
         mousePerLine.append("circle")
-            .attr("r", 5)
+            .attr("r", 8)
             .style("stroke", function(d) {
                 return color(d.name);
             })
@@ -201,7 +210,7 @@
 
         mousePerLine.append("text")
             .attr("transform", function (d,i) {
-                return "translate(" +14+","+(i*8)+")";
+                return "translate(" +10+","+(i*8)+")";
             });
 
         mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
@@ -259,9 +268,7 @@
             });
 
 
-
-
     });
 
 </script>
-<h4 style="text-align: center"> This is the lines chart of world co2 emission vs mean Temperature change</h4>
+<h3 style="text-align: center"> This is the lines chart of world co2 emission vs Global warming</h3>
