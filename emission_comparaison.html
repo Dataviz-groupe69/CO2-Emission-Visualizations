@@ -7,85 +7,12 @@
     <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
     <script data-require="d3@3.5.3" data-semver="3.5.3" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
     <title>
         DataVis Project
     </title>
     <style>
-        body {
-            background-color: rgb(255, 255, 255);
-        }
-        nav{
-            background-color: darkcyan;
-        }
-        #slider{
-            background-color: rgb(0, 255, 255);
-            color:#00FFFF;
-            width: 40%;
-            margin-left: 30%;
-        }
-        circle {
-
-            fill-opacity: .25;
-            stroke: rgb(15, 5, 255);
-            stroke-width: 2px;
-        }
-
-        .leaf circle {
-            fill-opacity: 1;
-        }
-
-        text {
-            font: 10px sans-serif;
-            text-anchor: middle;
-            cursor: pointer; cursor: hand
-        }
-
-        .legend {
-            font-size: 12px;
-            font-weight: bold;
-            text-anchor: middle;
-        }
-
-        .line {
-            fill:none;
-        }
-        .country-name {
-            margin: 0 !important;
-        }
-
-        .key-dot {
-            display: inline-block;
-            height: 10px;
-            margin-right: .5em;
-            width: 10px;
-        }
-        .axis path,
-        .axis line {
-            fill: none;
-            stroke: #000;
-            shape-rendering: crispEdges;
-        }
-
-        .legend {
-            margin-right:20px;
-        }
-
-        .big { background: #b43122;
-            margin-left: 48%;
-        }
-        .small { background: #1F77B4;
-            margin-left: 48%;
-        }
-
-        .accueil{
-            margin-left: 90%;
-        }
-        #Xaxis,#Yaxis {
-
-        }
-        #graph,#number_graph{
-            visibility: hidden;
-        }
+        @import "./style.css";
     </style>
 </head>
 <body>
@@ -107,7 +34,8 @@
     </div>
     <div class="legend1">
         <div class="legend1"> <p class="country-name"><span class="key-dot big"></span>Big Emission</p> </div>
-        <div class="legend1"> <p class="country-name"><span class="key-dot small"></span>Small and medium Emission</p> </div>
+        <div class="legend1"> <p class="country-name"><span class="key-dot meduim"></span>Medium Emission</p> </div>
+        <div class="legend1"> <p class="country-name"><span class="key-dot small"></span>Small Emission</p> </div>
     </div>
     <div class="accueil">
         <button onclick="window.location='./index.html'">Accueil </button>
@@ -139,18 +67,18 @@
         .style("font-size", "16px")
         .style("font-weight", "bold");
 
-    const diameter = Math.ceil(window.innerWidth*0.6);
+    const diameter = Math.ceil(window.innerWidth*0.5);
     format = d3.format(",d");
     var longueur_graph = Math.ceil(window.innerWidth*0.4);
     const svg = d3.select("body").append("svg")
         .attr("width", 1.8*diameter)
-        .attr("height", diameter*1.2)
+        .attr("height", diameter*1.5)
         .attr("id", "svg");
 
     const g = svg.append("g").attr("transform", "translate(2,2)");
     const pack = d3.pack()
         .size([diameter - 4, diameter - 4])
-        .padding(1.8);
+        .padding(2);
 
     d3.select("body").selectAll('input[name="brand"]').on("change", function() {
         Prograss = ! Prograss;
@@ -197,7 +125,7 @@
             .attr("class", function(d) { return d.children ? "node" : "leaf node"; })
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
         node.append("circle")
-            .attr("r", function(d) { return d.r; })
+            .attr("r", function(d) { return d.r>5 ? d.r:5; })
             .attr("fill",function (d) {
                 if(d.children){
                     return "#1F77B4";
@@ -206,14 +134,12 @@
                     // on le colore en rouge (danger) sinon en bleu
                     if((d.value/d.parent.value)>=0.3){
                         return "#b43122";
+                    }else if(d.value/d.parent.value>=0.15){
+                        return  "#ff4009";
                     }else{
-                        return "#1F77B4";
-                    }
+                    return  "#1F77B4";
                 }
-            });
-
-
-
+            }});
         node
             .on("click",function (d) {
                 if(!Prograss) {
@@ -251,6 +177,7 @@
             }).on("mouseout",function () {
             if(Prograss){
                 remove_graph();
+                svg.selectAll("#tooltip").remove();
             }
 
             //svg.selectAll("g").remove()
@@ -268,8 +195,8 @@
                     // ici le cas de survoler un pays
                 } else {
                     // console.log(d)
-                    draw_graph(d.data.data, d.data.pays, 3,d.parent.data.name)
-
+                    draw_graph(d.data.data, d.data.pays, 3,d.parent.data.name);
+                    //draw_bar_chart(d.data.data.proportions);
                 }
             }
         });
@@ -281,17 +208,97 @@
             .attr("dy", "0.3em")
             .style("font-weight", "bold")
             .attr("fill","#FFFFFF")
-            .text(function(d) { return ( d.data.pays.substring(0, d.r / 3)); })
+            .text(function(d) { return d.r>5 ? ( d.data.pays.substring(0, d.r / 3)):( d.data.pays.substring(0, 5 / 3)); })
     }
 
     // une fonction qui sert a dessiner le line chart
+    function draw_bar_chart(data) {
+        height = 1.6*longueur_graph;
+        const x = d3.scaleBand()
+            .range([diameter+20,diameter*1.7 ])
+            .padding(0.6);
+
+        const y = d3.scaleLinear()
+            .range([longueur_graph*1.6, longueur_graph*1.21]);
+        /*const svg1= d3.select("#chart").append("svg")
+            .attr("id", "svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        const div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);*/
+
+            // Mise en relation du scale avec les données de notre fichier
+            // Pour l'axe X, c'est la liste des pays
+            // Pour l'axe Y, c'est le max des populations
+            x.domain(['Solid Fuel','Liquid Fuel','Gas Fuel','Cement','Gas Flaring','Per Capita']);
+            y.domain([0, 100]);
+            var dd = ['Solid Fuel','Liquid Fuel','Gas Fuel','Cement','Gas Flaring','Per Capita'];
+            // Ajout de l'axe X au SVG
+            // Déplacement de l'axe horizontal et du futur texte (via la fonction translate) au bas du SVG
+            // Selection des noeuds text, positionnement puis rotation
+            svg.append("g")
+                //.attr("transform", "translate(0," + height + ")")
+                .attr('id','tooltip')
+                .call(d3.axisBottom(x).tickSize(5))
+                .attr("transform", "translate(0," + longueur_graph*1.6 + ")")
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-65)");
+
+            // Ajout de l'axe Y au SVG avec 6 éléments de légende en utilisant la fonction ticks (sinon D3JS en place autant qu'il peut).
+            svg.append("g").attr("id",'tooltip')
+                .call(d3.axisLeft(y).ticks(6)).attr("transform", "translate(0" + (diameter+20)+ ")");
+            console.log(data);
+            // Ajout des bars en utilisant les données de notre fichier data.tsv
+            // La largeur de la barre est déterminée par la fonction x
+            // La hauteur par la fonction y en tenant compte  de la population
+            // La gestion des events de la souris pour le popup
+            svg.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d,i) { return x(dd[i]); })
+                .attr("width",30)
+                .attr("y", function(d) { return y(d*100);})
+                .attr("height", function(d) { return  height - y(d*100); })
+                .attr("fill",'#3498DB')
+                /*.on("mouseover", function(d,i) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    div.html("Population : " + d[i])
+                        .style("left", (d3.event.pageX + 10) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+                })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });*/
+        svg.append("text")
+            .attr("x", diameter*1.4)
+            .attr("y", longueur_graph *1.3)
+            .attr("class","surface")
+            .attr("text-anchor", "middle")
+            .style("font-size", "14px")
+            .style("font-weight", "bold")
+            .text("Pourcentage d'emission par chaque secteur %");
+
+    }
     function draw_graph(data,title,indice,continent){
 
         var compute_data = compute_data_object(data,indice);
         var total_emission = compute_data.total_emission;
         var data_object = compute_data.data;
-        console.log(data_object)
-        var y = d3.scaleLinear().range([longueur_graph*1.2, longueur_graph*0.3]);
+        draw_bar_chart(compute_data.proportion);
+       // console.log(data_object)
+        var y = d3.scaleLinear().range([longueur_graph*1.15, longueur_graph*0.3]);
 
         var parseTime = d3.timeParse("%d-%b-%y");
         var x = d3.scaleTime()
@@ -309,7 +316,7 @@
         //console.log(data)
         var area = d3.area()
             .x(function(d) { return x(new Date(d.annee,0,0)); })
-            .y0(longueur_graph*1.2)
+            .y0(longueur_graph*1.15)
             .y1(function(d) { return y(d.emission); });
 
         y.domain([0, d3.max(data_object, function(d) { return d.emission; })]);
@@ -339,7 +346,7 @@
         svg.append("text")
             .attr("x", diameter*1.4)
             .attr("y", longueur_graph *1.1)
-            .attr("id","surface")
+            .attr("class","surface")
             .attr("text-anchor", "middle")
             .style("font-size", "18px")
             .style("font-weight", "bold")
@@ -531,27 +538,57 @@
             });
     }
     function compute_data_object(data,indice) {
+        //console.log(data);
         var data_object = new Array();
         var total_emission = 0;
+        var proportion = [0,0,0,0,0,0];
+        //console.log(proportion);
+        var tot;
         switch (indice) {
             case 1:
                 var sum;
+                tot =0;
+                for(var a=0;a<data.length;a++){
+                    tot += data[a].children.length;
+                    for(var b =0;b<data[a].children.length;b++){
+                        for(var k=0;k<6;k++){
+                            if(data[a].children[b].data.data.proportions) {
+                                proportion[k] += (data[a].children[b].data.data.proportions[k]);
+                            }
+                        }
+                    }
+                }
                 for (var compt = 0; compt < 100; compt++) {
                     sum = 0;
                     for (var i = 0; i < data.length; i++) {
                         //data_object.push({"annee":data.annees[i],"emission":data.emissions[i]})
                         for (var j = 0; j < data[i].children.length; j++) {
+
                             if (data[i].children[j].data.data.emissions[compt]) {
                                 sum += data[i].children[j].data.data.emissions[compt]
                             }
                         }
+
                     }
+
                     total_emission += sum;
                     data_object.push({"annee": 1950 + compt, "emission": sum})
                 }
+
+                for(var t=0;t<proportion.length;t++){
+                    proportion[t] /=tot;
+                }
+
                 break;
             case 2:
                 var sum;
+                for(var a=0;a<data.length;a++){
+                    for(var k=0;k<6;k++){
+                        if(data[a].data.data.proportions) {
+                            proportion[k] += Number(data[a].data.data.proportions[k]);
+                        }
+                    }
+                }
                 for (var compt = 0; compt < 100; compt++) {
                     sum = 0;
                     for (var i = 0; i < data.length; i++) {
@@ -560,19 +597,26 @@
                         if (data[i].data.data.emissions[compt]) {
                             sum += data[i].data.data.emissions[compt]
                         }
+
                     }
+
                     total_emission += sum;
                     data_object.push({"annee": 1950 + compt, "emission": sum})
                 }
+                for(var t=0;t<proportion.length;t++){
+                    proportion[t] /=data.length;
+                }
+
                 break;
             case 3:
                 for (var i = 0; i < data.annees.length; i++) {
                     data_object.push({"annee": data.annees[i], "emission": data.emissions[i]})
                 }
+                proportion = data.proportions;
                 total_emission = d3.sum(data.emissions);
                 break;
         }
-        return {"data": data_object, "total_emission": total_emission};
+        return {"data": data_object, "total_emission": total_emission,"proportion":proportion};
     }
     // une fonction de suppression des axes et de legend du svg
     function remove_graph() {
@@ -586,13 +630,16 @@
         d3.selectAll(".city").remove();
         d3.selectAll("line").remove();
         //svg.selectAll("rect").remove();
+        svg.selectAll("rect.bar").remove();
+        svg.selectAll("text.surface").remove();
+
         svg.selectAll("g#mouse-effects.mouse-over-effects").remove();
     }
     function line_chart(xAxis,y,message){
         // add x Axis
         svg.append("g")
             .attr("id","Xaxis")   //
-            .attr("transform", "translate(0," + longueur_graph*1.2 + ")")
+            .attr("transform", "translate(0," + longueur_graph*1.15 + ")")
             .call(xAxis);
 
         // add the Y Axis
