@@ -41,6 +41,13 @@
         <button onclick="window.location='./index.html'">Accueil </button>
     </div>
 </nav>
+<p> Dans cette première partie ( Progression et comparaison de l'emission de co2 )<br>
+    * On peut coher le radio button Graph progression en haut a gauche et après on survole les pays sur le bubble chart pour voir la courbe de progression
+avec des données réels entre 1950 - 2014 et de la prévision pour le reste , ainsi q'un bar chart avec qui montre les differents pourcentage d'emissions par chaque secteur<br>
+    * Si on coche le button comparaison, un slider qui s'affiche montrant le nombre de graphes a choisir pour etre comparés. Une fois le nombre choisi, il faut selectionner les pays en question par cliquer sur le pays (en bubble chart)
+    on verra après les graphes correspondants ainsi que des circle indicateurs montrant la valeur exacte de y, et avec ça un grouped bar chart qui affiche le pourcentage des differents secteurs (possibilité de survoler les bars chart pour voir la valeur exacte)
+</p>
+
 <script>
     var Prograss = true;
     var brands = ['Progress Graph', 'Comparaison Graph'];
@@ -68,6 +75,8 @@
         .style("font-weight", "bold");
 
     const diameter = Math.ceil(window.innerWidth*0.5);
+    var x = d3.scale.linear().range([0, diameter]);
+    var y = d3.scale.linear().range([0, diameter]);
     format = d3.format(",d");
     var longueur_graph = Math.ceil(window.innerWidth*0.4);
     const svg = d3.select("body").append("svg")
@@ -78,7 +87,11 @@
     const g = svg.append("g").attr("transform", "translate(2,2)");
     const pack = d3.pack()
         .size([diameter - 4, diameter - 4])
-        .padding(2);
+        .padding(3);
+
+    var detachedContainer = document.createElement("custom");
+    var dataContainer = d3.select(detachedContainer);
+
 
     d3.select("body").selectAll('input[name="brand"]').on("change", function() {
         Prograss = ! Prograss;
@@ -173,7 +186,10 @@
                     if (data_comparaison.length == limit) {
                         graphs_comparaison(data_comparaison, names, indices);
                     }
-                }
+                }/*else {
+
+                    zoom(root_1);
+                }*/
             }).on("mouseout",function () {
             if(Prograss){
                 remove_graph();
@@ -254,7 +270,7 @@
             // Ajout de l'axe Y au SVG avec 6 éléments de légende en utilisant la fonction ticks (sinon D3JS en place autant qu'il peut).
             svg.append("g").attr("id",'tooltip')
                 .call(d3.axisLeft(y).ticks(6)).attr("transform", "translate(0" + (diameter+20)+ ")");
-            console.log(data);
+            //console.log(data);
             // Ajout des bars en utilisant les données de notre fichier data.tsv
             // La largeur de la barre est déterminée par la fonction x
             // La hauteur par la fonction y en tenant compte  de la population
@@ -355,7 +371,7 @@
     }
 
     function graphs_comparaison(data_comp,names,indices){
-        var y = d3.scaleLinear().range([longueur_graph*1.2, longueur_graph*0.3]);
+        var y = d3.scaleLinear().range([longueur_graph*1.15, longueur_graph*0.3]);
 
         var parseTime = d3.timeParse("%d-%b-%y");
         var x = d3.scaleTime()
@@ -374,10 +390,13 @@
         var color = d3.scale.category10();
         color.domain(names);
         var data_ready =new  Array();
+        var data_grouped_bar_chart = new Array();
         for(var i =0;i<data_comp.length;i++) {
-            data_object = compute_data_object(data_comp[i], indices[i]).data;
-            data_ready.push({"name":names[i],"values":data_object});
-            max = Math.max(max, d3.max(data_object, function (d) {
+            data_object = compute_data_object(data_comp[i], indices[i]);
+            data_ready.push({"name":names[i],"values":data_object.data });
+            data_grouped_bar_chart.push({"name": names[i],'Solid Fuel':data_object.proportion[0],'Liquid Fuel':data_object.proportion[1],'Gas Fuel':data_object.proportion[2],'Cement':data_object.proportion[3],
+                'Gas Flaring':data_object.proportion[4],'Per Capita':data_object.proportion[5]});
+            max = Math.max(max, d3.max(data_object.data, function (d) {
                 return d.emission;
             }));
         }
@@ -398,7 +417,8 @@
                 .text(names[j]);
         }
         */
-
+        // ici on dessine le grouped bar chart
+        grouped_bar_chart(data_grouped_bar_chart,color);
         // ici on dessine les axes de line chart
         line_chart(xAxis,y," Comparaison of Co2 emission (µg/m³)");
 
@@ -621,30 +641,31 @@
     // une fonction de suppression des axes et de legend du svg
     function remove_graph() {
         svg.selectAll("path").remove();
-        svg.select("#Xaxis").remove();
-        svg.select("#Yaxis").remove();
+        svg.selectAll("g.Xaxis").remove();
+        svg.selectAll("g.Yaxis").remove();
         svg.select("#title").remove();
         svg.select("#surface").remove();
         svg.selectAll("#legend").remove();
+        svg.selectAll("g.legend").remove();
         //svg.selectAll("circle-mouse").remove();
         d3.selectAll(".city").remove();
         d3.selectAll("line").remove();
         //svg.selectAll("rect").remove();
         svg.selectAll("rect.bar").remove();
         svg.selectAll("text.surface").remove();
-
+        svg.selectAll("g.grouped").remove();
         svg.selectAll("g#mouse-effects.mouse-over-effects").remove();
     }
     function line_chart(xAxis,y,message){
         // add x Axis
         svg.append("g")
-            .attr("id","Xaxis")   //
+            .attr("class","Xaxis")   //
             .attr("transform", "translate(0," + longueur_graph*1.15 + ")")
             .call(xAxis);
 
         // add the Y Axis
         svg.append("g")
-            .attr("id","Yaxis")
+            .attr("class","Yaxis")
             .attr("transform", "translate(0" + (diameter+20)+ ")")
             .attr("y", 6)
             .attr("dy", ".71em")
@@ -660,7 +681,154 @@
             .style("font-weight", "bold")
             .text(message); //title+ " Co2 emissions line chart"
     }
+    function zoom(d, i,node) {
+        var k = (diameter) / (d.r) ;
+        x.domain([d.x - d.r, d.x + d.r]);
+        y.domain([d.y - d.r, d.y + d.r]);
 
+        var t = svg.transition()
+            .duration(d3.event.altKey ? 7500 : 750);
+        t.selectAll("circle")
+            .attr("cx", function(d) {
+                return x(d.x);
+            })
+            .attr("cy", function(d) {
+                return y(d.y);
+            })
+            .attr("r", function(d) {
+                return  d.r;
+            });
+
+        t.selectAll("text")
+            .attr("x", function (d) {
+               return x(d.x);
+            })
+
+            .attr("y", function (d) {
+                return y(d.y);
+            })
+            .style("opacity", function() { return k * d.r > 20 ? 1 : 0; });
+
+        node = d;
+        d3.event.stopPropagation();
+    }
+    
+    function grouped_bar_chart(data,color) {
+        var height = 1.6*longueur_graph;
+
+        const x0 = d3.scaleBand()
+            .range([diameter+20,diameter*1.7 ])
+            .padding(0.6);
+
+        const y = d3.scaleLinear()
+            .range([longueur_graph*1.6, longueur_graph*1.21]);
+
+        var z = d3.scaleOrdinal()
+            .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+       /*
+        var x0 = d3.scaleBand()
+            .rangeRound([0, width])
+            .paddingInner(0.1);
+        */
+        var x1 = d3.scaleBand()
+            .padding(0.05);
+        /*
+        var y = d3.scaleLinear()
+            .rangeRound([height, 0]);
+        */
+
+            var keys =['Solid Fuel','Liquid Fuel','Gas Fuel','Cement','Gas Flaring','Per Capita'] ;
+
+            x0.domain(data.map(function(d) { return d.name; }));
+            x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+            y.domain([0, 100]);
+
+            svg.append("g")
+                .attr("class","grouped")
+                .selectAll("g")
+                .data(data)
+                .enter().append("g")
+                .attr("transform", function(d) { return "translate(" + x0(d.name) + ",0)"; })
+                .selectAll("rect")
+                .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key],nom:d.name}; }); })
+                .enter().append("rect")
+                .attr("x", function(d) { return x1(d.key); })
+                .attr("y", function(d) { return y(d.value*100); })
+                .attr("width", x1.bandwidth())
+                .attr("height", function(d) { return height - y(d.value*100); })
+                .attr("fill", function(d) { return z(d.key); })
+                .on("mouseover",function (d) {
+                    //this.style("opacity",2);
+                    //console.log(x1(d.key))
+                    svg.append("text")
+                        .attr("transform","translate("+ x0(d.nom) +",0)")
+                        .attr("id","val")
+                        .attr("x",x1(d.key)+5)
+                        .attr("y",y(d.value*100)-1)
+                        .text((d.value*100).toFixed(2)+" %")
+                }).on("mouseout",function () {
+                    svg.selectAll("#val").remove();
+            });
+
+            svg.append("g")
+                .attr("class", "Xaxis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x0))
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("fill",function (d) {
+                    return color(d);
+                })
+                .attr("transform", "rotate(-65)");
+
+            svg.append("g")
+                .attr("class", "Yaxis")
+                .attr("transform", "translate(" +(diameter+20) + ",0)")
+                .call(d3.axisLeft(y).ticks(null, "s"))
+                .append("text")
+                .attr("x", 2)
+                .attr("y", y(y.ticks().pop()) + 0.5)
+                .attr("dy", "0.32em")
+                .attr("fill", "#000")
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "start")
+
+            var legend = svg.append("g")
+                .attr("class","legend")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", 10)
+                .attr("text-anchor", "end")
+                .selectAll("g")
+                .data(keys.slice().reverse())
+                .enter().append("g")
+                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+            legend.append("rect")
+                .attr("x",  2.21 *longueur_graph )
+                .attr("y", longueur_graph*1.245)
+                .attr("width", 19)
+                .attr("height", 19)
+                .attr("fill", z);
+
+            legend.append("text")
+                .attr("x", 2.2 *longueur_graph - 24)
+                .attr("y", longueur_graph*1.25)
+                .attr("dy", "0.32em")
+                .text(function(d) { return d; });
+
+            svg.append("text")
+                .attr("x", diameter*1.4)
+                .attr("y", longueur_graph *1.2)
+                .attr("class","surface")
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .text("Pourcentage d'emission par chaque secteur %");
+
+
+    }
 </script>
 </body>
 </html>
