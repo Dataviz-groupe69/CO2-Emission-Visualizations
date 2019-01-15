@@ -8,13 +8,14 @@
     display: none;
   }
   div.tooltip {
-    color: #222;
-    background-color: #fff;
-    padding: .5em;
-    text-shadow: #f5f5f5 0 1px 0;
-    border-radius: 2px;
-    opacity: 0.9;
-    position: absolute;
+    position: absolute;			
+    text-align: center;			
+    				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;
   }
   </style>
 </head>
@@ -27,10 +28,10 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
   let margin = {
-    top: 20,
-    right: 100,
+    top: 60,
+    right: 20,
     bottom: 30,
-    left: 100
+    left: 30
   }
   let width = window.innerWidth- margin.left - margin.right
   let height = window.innerHeight*0.75- margin.top - margin.bottom
@@ -83,11 +84,15 @@
       .data(data)
       .enter()
       .append('circle')
-      .attr('r', 5)
+      .transition()
+      .delay(function(_, i) { return i*100 })
+      .duration(500)
+      .attr('r', 8)
       .attr('cx', function(d) { return xScale(d['emission'])})
       .attr('cy', function(d) { return yScale(d['CSIRO'])})
-      .style('fill', function(d) { return colorScale(d['emission'])})
-      .on('mouseover', mouseover)
+      .style('fill', 'rgb(115, 171, 243)')
+      
+    svg.selectAll('circle').on('mouseover', mouseover)
       .on('mouseout', mouseout)
   }
 
@@ -103,10 +108,10 @@
       return parseInt(x)
     })
     tooltip.classed("hidden", false)
-           .attr("style", "left:" + (mouse[0] + 15) +
-            "px; top:" + (mouse[1] - 35) + "px")
+           .attr("style", "left:" + (mouse[0] + 45) +
+            "px; top:" + (mouse[1] + 45) + "px")
     if(d) {
-      tooltip.html("YEAR:" + d['Year'])
+      tooltip.html('YEAR:' + d['Year'] + '<br/>' + 'CSIRO:' + parseFloat(d['CSIRO']).toFixed(2) + '<br/>' + 'CO2:' + d['emission'])
     } else {
       tooltip.html('undefined')
     }
