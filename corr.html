@@ -1,0 +1,191 @@
+<!Doctype html>
+<html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<meta charset="UTF-8">
+
+	<style>
+	.chart {
+		margin: 0 auto;
+		display: table;
+	}
+
+	.regression {
+		stroke-width: 3px;
+		stroke: red;
+	}
+
+	P { 
+		text-align: center 
+	}
+
+	H2 {
+		text-align: center;
+	}
+
+
+	.grid line {
+		stroke: lightgrey;
+		stroke-opacity: 0.7;
+		shape-rendering: crispEdges;
+	}
+
+	.grid path {
+		stroke-width: 0;
+	}
+
+
+</style>
+
+</head>
+<body>
+
+	<div class="chart"></div>
+
+
+
+	<h2>Régression Linéaire et Corrélation de Pearson après normalisation de la température moyenne annuelle GISTEMP et de l'émission de CO2</h2>
+	<p>Source <a href="https://stackoverflow.com/questions/17407100/how-do-you-draw-linear-line-in-scatter-plot-with-d3-js"/>https://stackoverflow.com/questions/17407100/how-do-you-draw-linear-line-in-scatter-plot-with-d3-js</p>
+	<script>
+		var margin = {top: 5, right: 5, bottom: 50, left: 50},
+
+		width = 600 - margin.left - margin.right,
+		height = 600 - margin.top - margin.bottom;
+
+		var svg = d3.select(".chart").append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		var x = d3.scaleLinear()
+		.range([0,width]);
+
+		var y = d3.scaleLinear()
+		.range([height,0]);
+
+		var xAxis = d3.axisBottom()
+		.scale(x);
+
+		var yAxis = d3.axisLeft()
+		.scale(y);
+
+		d3.csv("rechauffement_clim_normalized.csv", types, function(error, data){
+
+			y.domain(d3.extent(data, function(d){ return d.y}));
+			x.domain(d3.extent(data, function(d){ return d.x}));
+
+	    // see below for an explanation of the calcLinear function
+	    var lg = calcLinear(data, "x", "y", d3.min(data, function(d){ return d.x}), d3.min(data, function(d){ return 3}));
+
+
+	    svg.append("line")
+	    .attr("class", "regression")
+	    .attr("x1", x(lg.ptA.x))
+	    .attr("y1", y(lg.ptA.y))
+	    .attr("x2", x(lg.ptB.x))
+	    .attr("y2", y(lg.ptB.y))
+
+	    .on("mouseover", function(d){
+	    	svg.selectAll("#mouseOverValue").data([d]).enter().append("text")
+	    	.attr("id", "mouseOverValue")
+	    	.text("Correlation de Pearson : 0.909475")
+	    	.attr("x", d3.mouse(this)[0]+20)
+	    	.attr("y", d3.mouse(this)[1]+20)
+	    	.style("font-size", "15px");
+
+	    })
+
+	    .on("mouseout", function(d){
+	    	svg.selectAll("#mouseOverValue").remove();
+
+	    });
+
+
+	    svg.append("g")
+	    .attr("class", "x axis")
+	    .attr("transform", "translate(0," + height + ")")
+	    .call(xAxis)
+
+	    svg.append("g")
+	    .attr("class", "y axis")
+	    .call(yAxis);
+
+
+
+	    svg.selectAll(".point")
+	    .data(data)
+	    .enter().append("circle")
+	    .attr("class", "point")
+	    .attr("r", 3)
+	    .attr("cy", function(d){ return y(d.y); })
+	    .attr("cx", function(d){ return x(d.x); })
+	    .attr("fill", "blue");
+
+
+});
+
+		function types(d){
+			d.x = +d.x;
+			d.y = +d.y;
+
+			return d;
+		}
+
+
+
+		function calcLinear(data, x, y, minX, minY){
+
+			var n = data.length;
+
+			var pts = [];
+			data.forEach(function(d,i){
+				var obj = {};
+				obj.x = d[x];
+				obj.y = d[y];
+				obj.mult = obj.x*obj.y;
+				pts.push(obj);
+			});
+
+			var sum = 0;
+			var xSum = 0;
+			var ySum = 0;
+			var sumSq = 0;
+			pts.forEach(function(pt){
+				sum = sum + pt.mult;
+				xSum = xSum + pt.x;
+				ySum = ySum + pt.y;
+				sumSq = sumSq + (pt.x * pt.x);
+			});
+			var a = sum * n;
+			var b = xSum * ySum;
+			var c = sumSq * n;
+			var d = xSum * xSum;
+
+
+			var m = (a - b) / (c - d);
+
+			var e = ySum;
+
+			var f = m * xSum;
+
+
+			var b = (e - f) / n;
+
+			return {
+				ptA : {
+					x: minX,
+					y: m * minX + b
+				},
+				ptB : {
+					x: (minY - b) / m,
+					y: minY
+
+				}
+			}
+
+		}
+	</script>
+
+</body>
+</html>
