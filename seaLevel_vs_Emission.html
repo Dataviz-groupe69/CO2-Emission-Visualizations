@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Datavis project</title>
-    <style>
-        #slider{
-            background-color: rgb(0, 255, 255);
-            color:#00FFFF;
-            width: 40%;
-            margin-left: 30%;
-        }
-
-
-    </style>
+  <meta charset="UTF-8">
+  <title>Datavis project</title>
+  <style>
+  .hidden {
+    display: none;
+  }
+  div.tooltip {
+    color: #222;
+    background-color: #fff;
+    padding: .5em;
+    text-shadow: #f5f5f5 0 1px 0;
+    border-radius: 2px;
+    opacity: 0.9;
+    position: absolute;
+  }
+  </style>
 </head>
 <body>
 <div>
@@ -36,7 +40,8 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
+  let tooltip = d3.select("div#charts").append("div")
+                  .attr("class", "hidden tooltip")
 
   d3.csv("./seaLevel_co2.csv",function (error,data) {
     // console.log(data)
@@ -44,6 +49,7 @@
   })
 
   function visualization(data) {
+    let colorScale = d3.scaleOrdinal(d3.schemeCategory20)
     let xScale = d3.scaleLinear().domain(d3.extent(data, function(d) {
       return parseInt(d['emission'])
     })).range([0, height])
@@ -72,8 +78,48 @@
       .attr('y', height - 5)
       .attr('class', 'label')
       .text('CO2')
+
+    svg.selectAll('circle')
+      .data(data)
+      .enter()
+      .append('circle')
+      .attr('r', 5)
+      .attr('cx', function(d) { return xScale(d['emission'])})
+      .attr('cy', function(d) { return yScale(d['CSIRO'])})
+      .style('fill', function(d) { return colorScale(d['emission'])})
+      .on('mouseover', mouseover)
+      .on('mouseout', mouseout)
   }
 
+  function mouseover(d) {
+    // console.log('Year: ', d['Year'])
+    d3.selectAll('circle')
+      .filter(function(e) {
+        return e !== d
+      })
+      .style('opacity', 0.09)
+    
+    let mouse = d3.mouse(svg.node()).map(function(x) {
+      return parseInt(x)
+    })
+    tooltip.classed("hidden", false)
+           .attr("style", "left:" + (mouse[0] + 15) +
+            "px; top:" + (mouse[1] - 35) + "px")
+    if(d) {
+      tooltip.html("YEAR:" + d['Year'])
+    } else {
+      tooltip.html('undefined')
+    }
+  }
+
+  function mouseout(d) {
+    d3.selectAll('circle')
+      .filter(function(e) {
+        return e !== d
+      })
+    .style('opacity', 1)
+    tooltip.classed("hidden", true)
+  }
 </script>
 
 </body>
