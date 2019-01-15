@@ -1,118 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Datavis project</title>
-    <style>
-        #slider{
-            background-color: rgb(0, 255, 255);
-            color:#00FFFF;
-            width: 40%;
-            margin-left: 30%;
-        }
-
-
-    </style>
+  <meta charset="UTF-8">
+  <title>Datavis project</title>
+  <style>
+  .hidden {
+    display: none;
+  }
+  div.tooltip {
+    position: absolute;			
+    text-align: center;			
+    				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;
+  }
+  </style>
 </head>
 <body>
 <div>
-    <input id="slider" type="range" value="1" min="1" max="135" step="1" width="200" />
-    <span id="year">1880</span>
+    <div id="charts">
+
+    </div>
 </div>
-<script src="https://d3js.org/d3.v3.min.js"></script>
-<script src="https://unpkg.com/d3-simple-slider/build/d3-simple-slider.js"></script>
-<script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
-<script data-require="d3@3.5.3" data-semver="3.5.3" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
-<script src="https://d3js.org/d3.v4.min.js"></script><script>
-    var margin = {
-            top: 20,
-            right: 100,
-            bottom: 30,
-            left: 100
-        },
-        width = window.innerWidth- margin.left - margin.right,
-        height = window.innerHeight*0.75- margin.top - margin.bottom;
-    var svg = d3.select("body").append("svg")
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+  let margin = {
+    top: 60,
+    right: 20,
+    bottom: 30,
+    left: 30
+  }
+  let width = window.innerWidth- margin.left - margin.right
+  let height = window.innerHeight*0.75- margin.top - margin.bottom
+  let svg = d3.select("div#charts").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+  let tooltip = d3.select("div#charts").append("div")
+                  .attr("class", "hidden tooltip")
 
+  d3.csv("./seaLevel_co2.csv",function (error,data) {
+    // console.log(data)
+    visualization(data)
+  })
 
-d3.csv("./sea-level.csv",function (error,data) {
-    if (error) throw error;
-    var year = 1880;
-    var choice = 1;
-    d3.select("#slider").on("input", function() {
-        //var root_2 = root;
-        year = Number(1879) + Number(this.value)
-        choice = this.value - 1;
-        d3.select('#year').text(year);
-        svg.select("#sealevel").remove();
+  function visualization(data) {
+    let colorScale = d3.scaleOrdinal(d3.schemeCategory20)
+    let xScale = d3.scaleLinear().domain(d3.extent(data, function(d) {
+      return parseInt(d['emission'])
+    })).range([0, height])
+    let yScale = d3.scaleLinear().domain(d3.extent(data, function(d) {
+      return parseInt(d['CSIRO'])
+    })).range([height, 0])
 
-        svg.selectAll("rect")
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("x","0px")
-            .attr("y",height).attr("height",function (d,i) {
-            if(i === choice){
-                return y(d.CSIRO);
-            }
-        }).attr("width",0.5*width).attr("fill","blue")
-    });
-    var rectangles = [{"name": "venis", "x": 10, "y": 0.5 * height + 30}, {
-        "name": "venis",
-        "x": 60,
-        "y": 0.5 * height + 35
-    }, {"name": "venis", "x": 25, "y": 0.5 * height + 25}, {"name": "venis", "x": 80, "y": 0.5 * height + 40}]
+    let xAxis = d3.axisBottom(xScale).ticks(5)
+    let yAxis = d3.axisLeft(yScale).ticks(5)
 
-    svg.selectAll("rect")
-        .data(rectangles)
-        .enter()
-        .append("rect")
-        .attr("width", "20px")
-        .attr("height", "14px")
-        .attr("x", function (d) {
-        return d.x
+    svg.append('g')
+      .attr('transform', 'translate(0,' + height + ')')
+      .attr('class', 'x-axis')
+      .call(xAxis)
+    svg.append('g')
+      .attr('transform', 'translate(0, 0)')
+      .attr('class', 'y-axis')
+      .call(yAxis)
+    svg.append('text')
+      .attr('x', 5)
+      .attr('y', 0)
+      .attr('class', 'label')
+      .text('CSIRO')
+    svg.append('text')
+      .attr('x', height)
+      .attr('y', height - 5)
+      .attr('class', 'label')
+      .text('CO2')
 
-    }).attr("y", function (d) {
-        return d.y;
+    svg.selectAll('circle')
+      .data(data)
+      .enter()
+      .append('circle')
+      .transition()
+      .delay(function(_, i) { return i*100 })
+      .duration(500)
+      .attr('r', 8)
+      .attr('cx', function(d) { return xScale(d['emission'])})
+      .attr('cy', function(d) { return yScale(d['CSIRO'])})
+      .style('fill', 'rgb(115, 171, 243)')
+      
+    svg.selectAll('circle').on('mouseover', mouseover)
+      .on('mouseout', mouseout)
+  }
 
+  function mouseover(d) {
+    // console.log('Year: ', d['Year'])
+    d3.selectAll('circle')
+      .filter(function(e) {
+        return e !== d
+      })
+      .style('opacity', 0.09)
+    
+    let mouse = d3.mouse(svg.node()).map(function(x) {
+      return parseInt(x)
     })
-    var x = d3.scaleLinear()
-        .range([0, 0.5 * width]);
+    tooltip.classed("hidden", false)
+           .attr("style", "left:" + (mouse[0] + 45) +
+            "px; top:" + (mouse[1] + 45) + "px")
+    if(d) {
+      tooltip.html('YEAR:' + d['Year'] + '<br/>' + 'CSIRO:' + parseFloat(d['CSIRO']).toFixed(2) + '<br/>' + 'CO2:' + d['emission'])
+    } else {
+      tooltip.html('undefined')
+    }
+  }
 
-    var y = d3.scaleLinear()
-        .range([height, 0.5 * height]);
-
-    var color = d3.scale.category10();
-
-    y.domain([0,d3.max(data,function (d) {
-        return d.CSIRO;
-    })])
-
-
-    var xAxis = d3.axisBottom(x);
-
-    var yAxis = d3.axisLeft(y);
-
-
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-
-
-})
-
-    </script>
+  function mouseout(d) {
+    d3.selectAll('circle')
+      .filter(function(e) {
+        return e !== d
+      })
+    .style('opacity', 1)
+    tooltip.classed("hidden", true)
+  }
+</script>
 
 </body>
 </html>
