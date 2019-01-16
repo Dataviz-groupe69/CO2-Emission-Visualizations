@@ -132,3 +132,8 @@ button{
 .y-axix{
     font: 14px sans-serif;
 }
+
+.text-info {
+    background-color:grey;
+    color:white;
+}
