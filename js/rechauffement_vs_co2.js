@@ -10,7 +10,7 @@ var svg1 = d3.select(".chart").append("svg")
     .attr("transform", "translate(" + margin_1.left + "," + margin_1.top + ")");
 
 var x_1 = d3.scaleLinear()
-    .range([0,width_1*0.7]);
+    .range([10,width_1*0.7]);
 
 var y_1 = d3.scaleLinear()
     .range([height_1*0.7,0]);
@@ -40,7 +40,7 @@ d3.csv("csv/rechauffement_clim_normalized.csv", types, function(error, data){
         .on("mouseover", function(d){
             svg1.selectAll("#mouseOverValue").data([d]).enter().append("text")
                 .attr("id", "mouseOverValue")
-                .text("Correlation de Pearson : 0.909475")
+                .text("Correlation de Pearson : 0.9095")
                 .attr("x", d3.mouse(this)[0]+20)
                 .attr("y", d3.mouse(this)[1]+20)
                 .style("font-size", "15px");
@@ -57,8 +57,10 @@ d3.csv("csv/rechauffement_clim_normalized.csv", types, function(error, data){
         .attr("transform", "translate(0," + height_1*0.7 + ")")
         .call(xAxis_1)
 
+
     svg1.append("g")
         .attr("class", "y axis")
+        .attr("transform", "translate(10,0)")
         .call(yAxis_1);
 
 
