@@ -80,14 +80,14 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
     format = d3.format(",d");
     var longueur_graph = Math.ceil(window.innerWidth*0.4);
     const svg = d3.select("body").append("svg")
-        .attr("width", 1.8*diameter)
+        .attr("width", 1.9*diameter)
         .attr("height", diameter*1.5)
         .attr("id", "svg");
 
     const g = svg.append("g").attr("transform", "translate(2,2)");
     const pack = d3.pack()
         .size([diameter - 4, diameter - 4])
-        .padding(3);
+        .padding(4);
 
     var detachedContainer = document.createElement("custom");
     var dataContainer = d3.select(detachedContainer);
@@ -229,27 +229,16 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
 
     // une fonction qui sert a dessiner le line chart
     function draw_bar_chart(data) {
-        height = 1.6*longueur_graph;
+        height = 1.1*longueur_graph;
         const x = d3.scaleBand()
             .range([diameter+20,diameter*1.7 ])
             .padding(0.6);
 
         const y = d3.scaleLinear()
-            .range([longueur_graph*1.6, longueur_graph*1.21]);
-        /*const svg1= d3.select("#chart").append("svg")
-            .attr("id", "svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        const div = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);*/
-
-            // Mise en relation du scale avec les données de notre fichier
-            // Pour l'axe X, c'est la liste des pays
-            // Pour l'axe Y, c'est le max des populations
+            .range([height, longueur_graph*0.8]);
+            // Mise en relation du scale avec les données de notre data
+            // Pour l'axe X, c'est la liste des differents type
+            // Pour l'axe Y, c'est le max des pourcentage
             x.domain(['Solid Fuel','Liquid Fuel','Gas Fuel','Cement','Gas Flaring','Per Capita']);
             y.domain([0, 100]);
             var dd = ['Solid Fuel','Liquid Fuel','Gas Fuel','Cement','Gas Flaring','Per Capita'];
@@ -260,7 +249,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
                 //.attr("transform", "translate(0," + height + ")")
                 .attr('id','tooltip')
                 .call(d3.axisBottom(x).tickSize(5))
-                .attr("transform", "translate(0," + longueur_graph*1.6 + ")")
+                .attr("transform", "translate(0," + height + ")")
                 .selectAll("text")
                 .style("text-anchor", "end")
                 .attr("dx", "-.8em")
@@ -271,10 +260,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
             svg.append("g").attr("id",'tooltip')
                 .call(d3.axisLeft(y).ticks(6)).attr("transform", "translate(0" + (diameter+20)+ ")");
             //console.log(data);
-            // Ajout des bars en utilisant les données de notre fichier data.tsv
-            // La largeur de la barre est déterminée par la fonction x
-            // La hauteur par la fonction y en tenant compte  de la population
-            // La gestion des events de la souris pour le popup
+            // Ajout des bars en utilisant les données de notre data
             svg.selectAll(".bar")
                 .data(data)
                 .enter().append("rect")
@@ -284,42 +270,36 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
                 .attr("y", function(d) { return y(d*100);})
                 .attr("height", function(d) { return  height - y(d*100); })
                 .attr("fill",'#3498DB')
-                /*.on("mouseover", function(d,i) {
-                    div.transition()
-                        .duration(200)
-                        .style("opacity", .9);
-                    div.html("Population : " + d[i])
-                        .style("left", (d3.event.pageX + 10) + "px")
-                        .style("top", (d3.event.pageY - 50) + "px");
-                })
-                .on("mouseout", function(d) {
-                    div.transition()
-                        .duration(500)
-                        .style("opacity", 0);
-                });*/
+
         svg.append("text")
             .attr("x", diameter*1.4)
-            .attr("y", longueur_graph *1.3)
+            .attr("y", height*0.8)
             .attr("class","surface")
             .attr("text-anchor", "middle")
             .style("font-size", "14px")
             .style("font-weight", "bold")
-            .text("Pourcentage d'emission par chaque secteur %");
+            .text("Pourcentage d'emission par chaque type %");
 
     }
+    // dessiner le graphe dans l'etape de progression(line chart et area)
     function draw_graph(data,title,indice,continent){
+
+        var axis_y_debut = longueur_graph*0.05,
+            axis_y_fin = longueur_graph*0.75,
+            axis_x_debut = diameter +30,
+            axis_x_fin = diameter*1.7;
 
         var compute_data = compute_data_object(data,indice);
         var total_emission = compute_data.total_emission;
         var data_object = compute_data.data;
         draw_bar_chart(compute_data.proportion);
        // console.log(data_object)
-        var y = d3.scaleLinear().range([longueur_graph*1.15, longueur_graph*0.3]);
+        var y = d3.scaleLinear().range([axis_y_fin, axis_y_debut]);
 
         var parseTime = d3.timeParse("%d-%b-%y");
         var x = d3.scaleTime()
             .domain([new Date(1950,0,0),new Date(2050,1,1)])
-            .range([diameter+20, diameter*1.7]);
+            .range([axis_x_debut, axis_x_fin]);
 
         var xAxis = d3.axisBottom(x)
             .tickFormat(d3.timeFormat("%Y"));
@@ -332,7 +312,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
         //console.log(data)
         var area = d3.area()
             .x(function(d) { return x(new Date(d.annee,0,0)); })
-            .y0(longueur_graph*1.15)
+            .y0(axis_y_fin)
             .y1(function(d) { return y(d.emission); });
 
         y.domain([0, d3.max(data_object, function(d) { return d.emission; })]);
@@ -348,6 +328,20 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
             .attr("d", area)
             .attr("fill", z[continent_number]);
 
+        svg.append("linearGradient")
+            .attr("id", "co2_emission-gradient")
+            .attr("gradientUnits", "userSpaceOnUse")
+            .attr("x1", diameter+30).attr("y1", axis_y_fin)
+            .attr("x2", diameter+30).attr("y2", axis_y_debut)
+            .selectAll("stop")
+            .data([
+                {offset: "0%", color: "steelblue"},
+                {offset: "70%", color: "gray"},
+                {offset: "100%", color: "red"}
+            ])
+            .enter().append("stop")
+            .attr("offset", function(d) { return d.offset; })
+            .attr("stop-color", function(d) { return d.color; });
         //console.log(z(continents[continent]));
         // ajouter le path de line
         svg.append("path")
@@ -357,11 +351,11 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
             .style("stroke-width","3px")
             .attr("d", valueline);
 
-        line_chart(xAxis,y,title+" Co2 emission line chart (µg/m³)");
+        draw_Axis(xAxis,y,axis_y_fin,axis_x_debut,diameter*1.35,axis_y_debut*0.9,title+" Co2 emission line chart (µg/m³) [1950-2050]");
 
         svg.append("text")
             .attr("x", diameter*1.4)
-            .attr("y", longueur_graph *1.1)
+            .attr("y", longueur_graph *0.69)
             .attr("class","surface")
             .attr("text-anchor", "middle")
             .style("font-size", "18px")
@@ -370,13 +364,17 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
 
     }
 
+    // ici c'est la fonction qui sert a tracer l'ensemble de graphes pour faire une comparaison
     function graphs_comparaison(data_comp,names,indices){
-        var y = d3.scaleLinear().range([longueur_graph*1.15, longueur_graph*0.3]);
-
+        var axis_y_debut = longueur_graph*0.05,
+            axis_y_fin = longueur_graph*0.75,
+            axis_x_debut = diameter +30,
+            axis_x_fin = diameter*1.7;
+        var y = d3.scaleLinear().range([axis_y_fin, axis_y_debut]);
         var parseTime = d3.timeParse("%d-%b-%y");
         var x = d3.scaleTime()
             .domain([new Date(1950,0,0),new Date(2050,1,1)])
-            .range([diameter+20, diameter*1.7]);
+            .range([axis_x_debut, axis_x_fin]);
 
         var xAxis = d3.axisBottom(x)
             .tickFormat(d3.timeFormat("%Y"));
@@ -401,26 +399,11 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
             }));
         }
         y.domain([0, max]);
-        /*for (var j=0;j<data_ready.length;j++){
-            svg.append("path")
-                .data([data_ready[j]])
-                .attr("class", "line")
-                .attr("stroke",color(j))
-                .attr("d", valueline);
 
-            svg.append("text")
-                .attr("x", diameter*1.2)
-                .attr("y", longueur_graph*0.3 +j*15)
-                .attr("id","legend")
-                .attr("class", "legend")
-                .attr("fill",color(j))
-                .text(names[j]);
-        }
-        */
         // ici on dessine le grouped bar chart
         grouped_bar_chart(data_grouped_bar_chart,color);
         // ici on dessine les axes de line chart
-        line_chart(xAxis,y," Comparaison of Co2 emission (µg/m³)");
+        draw_Axis(xAxis,y,axis_y_fin,axis_x_debut,diameter*1.35,axis_y_debut*0.7  ," Comparaison of Co2 emission (µg/m³) [1950-2050]");
 
         // ici c'est l'etape de dessiner les graphes de comparaison avec un petit circle et une bar
         // qui afficher le detail de l'emission
@@ -446,9 +429,9 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
                     value: d.values[0]
                 };
             })
-            .attr("x", diameter*1.2)
+            .attr("x", diameter*1.75)
             .attr("y", function (d,i) {
-                return longueur_graph*0.3 +i*12;
+                return axis_y_debut +i*12;
             })
             .attr("fill",function (d) {
                 console.log(color(d.name));
@@ -465,7 +448,8 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
             .attr("class", "mouse-over-effects")
             .attr("id","mouse-effects");
 
-        mouseG.append("path") // this is the black vertical line to follow mouse
+        // ici c'est la bar vertical de couleu noire qui se deplace au fil du temps
+        mouseG.append("path")
             .attr("class", "mouse-line")
             .style("stroke", "black")
             .style("stroke-width", "1px")
@@ -492,14 +476,15 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
         mousePerLine.append("text")
             .attr("transform", "translate(25,3)");
 
-        mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
-            .attr('width', 0.7*diameter-20) // can't catch mouse events on a g element
-            .attr('height', 0.9*longueur_graph)
-            .attr("x",diameter+20)
-            .attr("y",longueur_graph*0.3)
+        // ici creation de zone pour capter les mouvements dans le canevas
+        mouseG.append('svg:rect')
+            .attr('width', 0.7*diameter-20)
+            .attr('height', 0.7*longueur_graph)
+            .attr("x",axis_x_debut)
+            .attr("y",axis_y_debut)
             .attr('fill', 'none')
             .attr('pointer-events', 'all')
-            .on('mouseout', function() { // on mouse out hide line, circles and text
+            .on('mouseout', function() {
                 d3.select(".mouse-line")
                     .style("opacity", "0");
                 d3.selectAll(".mouse-per-line circle")
@@ -507,7 +492,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
                 d3.selectAll(".mouse-per-line text")
                     .style("opacity", "0");
             })
-            .on('mouseover', function() { // on mouse in show line, circles and text
+            .on('mouseover', function() {
                 d3.select(".mouse-line")
                     .style("opacity", "1");
                 d3.selectAll(".mouse-per-line circle")
@@ -519,8 +504,8 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
                 var mouse = d3.mouse(this);
                 d3.select(".mouse-line")
                     .attr("d", function() {
-                        var d = "M" + mouse[0] + "," + (1.2*longueur_graph);
-                        d += " " + mouse[0] + "," + (0.3*longueur_graph);
+                        var d = "M" + mouse[0] + "," + (axis_y_fin);
+                        d += " " + mouse[0] + "," + (axis_y_debut);
                         //console.log(d,mouse[0]);
                         return d;
                     });
@@ -638,7 +623,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
         }
         return {"data": data_object, "total_emission": total_emission,"proportion":proportion};
     }
-    // une fonction de suppression des axes et de legend du svg
+    // une fonction de nettoyage de svg (suppression bar chart graphe et les axes)
     function remove_graph() {
         svg.selectAll("path").remove();
         svg.selectAll("g.Xaxis").remove();
@@ -656,31 +641,40 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
         svg.selectAll("g.grouped").remove();
         svg.selectAll("g#mouse-effects.mouse-over-effects").remove();
     }
-    function line_chart(xAxis,y,message){
+    function draw_Axis(xAxis,y,xtrasnlation,ytranslation,titre_x_pos,titre_y_pos,message){
         // add x Axis
         svg.append("g")
             .attr("class","Xaxis")   //
-            .attr("transform", "translate(0," + longueur_graph*1.15 + ")")
+            .attr("transform", "translate(0," + xtrasnlation + ")")
             .call(xAxis);
 
         // add the Y Axis
         svg.append("g")
             .attr("class","Yaxis")
-            .attr("transform", "translate(0" + (diameter+20)+ ")")
+            .attr("transform", "translate(0" + ytranslation+ ")")
             .attr("y", 6)
             .attr("dy", ".71em")
             .call(d3.axisLeft(y));
 
+
+        svg.selectAll("Y axis").data(y.ticks(10)).enter()
+            .append("line")
+            .attr("class", "horizontalGrid")
+            .attr("x1", diameter+20)
+            .attr("x2", 1.7*diameter)
+            .attr("y", function(d){ console.log(y(d));return y(d);})
+            //.attr("y2", function(d){console.log(y(d-1000)); return y(d);});
         // ici on ajoute le titre de line chart
         svg.append("text")
-            .attr("x", diameter*1.4)
-            .attr("y", longueur_graph*0.2)
+            .attr("x", titre_x_pos)
+            .attr("y", titre_y_pos)
             .attr("id","title")
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
             .text(message); //title+ " Co2 emissions line chart"
     }
+    // zoom sur le bubble chart
     function zoom(d, i,node) {
         var k = (diameter) / (d.r) ;
         x.domain([d.x - d.r, d.x + d.r]);
@@ -712,30 +706,25 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
         node = d;
         d3.event.stopPropagation();
     }
-    
+
+
+
+    // c'est la fonction qui sert a dessiner un grouped bar chart
     function grouped_bar_chart(data,color) {
-        var height = 1.6*longueur_graph;
+        var height = 1.1*longueur_graph;
 
         const x0 = d3.scaleBand()
             .range([diameter+20,diameter*1.7 ])
             .padding(0.6);
 
         const y = d3.scaleLinear()
-            .range([longueur_graph*1.6, longueur_graph*1.21]);
+            .range([height, longueur_graph*0.8]);
 
         var z = d3.scaleOrdinal()
             .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-       /*
-        var x0 = d3.scaleBand()
-            .rangeRound([0, width])
-            .paddingInner(0.1);
-        */
+
         var x1 = d3.scaleBand()
             .padding(0.05);
-        /*
-        var y = d3.scaleLinear()
-            .rangeRound([height, 0]);
-        */
 
             var keys =['Solid Fuel','Liquid Fuel','Gas Fuel','Cement','Gas Flaring','Per Capita'] ;
 
@@ -765,7 +754,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
                         .attr("id","val")
                         .attr("x",x1(d.key)+5)
                         .attr("y",y(d.value*100)-1)
-                        .text((d.value*100).toFixed(2)+" %")
+                        .text(d.key +" = "+(d.value*100).toFixed(2)+" %")
                 }).on("mouseout",function () {
                     svg.selectAll("#val").remove();
             });
@@ -807,28 +796,29 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
 
             legend.append("rect")
                 .attr("x",  2.21 *longueur_graph )
-                .attr("y", longueur_graph*1.245)
+                .attr("y", longueur_graph*0.8)
                 .attr("width", 19)
                 .attr("height", 19)
                 .attr("fill", z);
 
             legend.append("text")
                 .attr("x", 2.2 *longueur_graph - 24)
-                .attr("y", longueur_graph*1.25)
+                .attr("y", longueur_graph*0.81)
                 .attr("dy", "0.32em")
                 .text(function(d) { return d; });
 
             svg.append("text")
                 .attr("x", diameter*1.4)
-                .attr("y", longueur_graph *1.2)
+                .attr("y", longueur_graph *0.8)
                 .attr("class","surface")
                 .attr("text-anchor", "middle")
                 .style("font-size", "14px")
                 .style("font-weight", "bold")
-                .text("Pourcentage d'emission par chaque secteur %");
+                .text("Pourcentage d'emission par chaque type %");
 
 
     }
 </script>
+
 </body>
 </html>

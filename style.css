@@ -1,7 +1,10 @@
 body {
     background-color: rgb(255, 255, 255);
 }
-nav{
+.area {
+    fill: url(#co2_emission-gradient);
+    stroke-width: 05px;
+}nav{
     background-color: darkcyan;
 }
 #slider{
@@ -76,4 +79,8 @@ text {
 }
 #graph,#number_graph{
     visibility: hidden;
+}
+p{
+    align-content: center;
+    width: 70%;
 }
