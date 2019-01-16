@@ -87,7 +87,7 @@ function mouseover(d) {
     })
 
     tooltip.classed("hidden", false)
-        .attr("style", "left:" + (mouse[0] + window.innerWidth*0.1) +
+        .attr("style", "left:" + (mouse[0] + window.innerWidth*0.3) +
             "px; top:" + (mouse[1]+window.innerHeight*2.5) + "px")
     if(d) {
         tooltip.html('YEAR:' + d['Year'] + '<br/>' + 'CSIRO:' + parseFloat(d['CSIRO']).toFixed(2) + '<br/>' + 'CO2:' + d['emission'] +' µg/m³')
