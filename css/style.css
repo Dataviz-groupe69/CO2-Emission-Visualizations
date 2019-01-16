@@ -1,0 +1,131 @@
+body {
+    background-color: rgb(255, 255, 255);
+}
+.area {
+    fill: url(#co2_emission-gradient);
+    stroke-width: 05px;
+}
+#slider{
+    background-color: rgb(0, 255, 255);
+    color:#00FFFF;
+    width: 40%;
+    margin-left: 30%;
+}
+circle {
+
+    fill-opacity: .25;
+    stroke: rgb(15, 5, 255);
+    stroke-width: 2px;
+}
+
+.leaf circle {
+    fill-opacity: 1;
+}
+
+text {
+    font: 10px sans-serif;
+    text-anchor: middle;
+    cursor: pointer; cursor: hand
+}
+
+.legend {
+    font-size: 12px;
+    font-weight: bold;
+    text-anchor: middle;
+}
+
+.line {
+    fill:none;
+}
+.country-name {
+    margin: 0 !important;
+}
+
+.key-dot {
+    display: inline-block;
+    height: 10px;
+    margin-right: .5em;
+    width: 10px;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.legend {
+    margin-right:20px;
+}
+
+.big { background: #b43122;
+    margin-left: 48%;
+}
+.small { background: #1F77B4;
+    margin-left: 48%;
+}
+
+.meduim { background: #ff4009;
+    margin-left: 48%;
+}
+
+.accueil{
+    margin-left: 90%;
+}
+#Xaxis,#Yaxis {
+
+}
+#graph,#number_graph{
+    visibility: hidden;
+}
+
+.chart {
+    margin: 0 auto;
+    display: table;
+}
+.chart_2{
+    margin: 0 auto;
+    display: table;
+}
+.regression {
+    stroke-width: 3px;
+    stroke: red;
+}
+
+p {
+    text-align: center
+}
+
+h2 {
+    text-align: center;
+}
+
+h4{
+    text-align: center;
+}
+
+.grid line {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+
+.grid path {
+    stroke-width: 0;
+}
+.hidden {
+    display: none;
+}
+div.tooltip {
+    position: absolute;
+    text-align: center;
+
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+button{
+    margin-left: 45%;
+}

@@ -1,0 +1,175 @@
+﻿{
+"name": "France",
+"children": [
+		{
+		"name": "Auvergne-Rhône-Alpes",
+		"children": [
+			{"name": "Ain", "population": 614331},
+			{"name": "Allier", "population": 353124},
+			{"name": "Ardèche", "population": 324885},
+			{"name": "Cantal", "population": 154135},
+			{"name": "Drôme", "population": 499313},
+			{"name": "Isère", "population": 1233759},
+			{"name": "Loire", "population": 766729},
+			{"name": "Haute-Loire", "population": 231877},
+			{"name": "Puy-de-Dôme", "population": 649643},
+			{"name": "Rhône", "population": 1756069},
+			{"name": "Savoie", "population": 428751},
+			{"name": "Haute-Savoie", "population": 760979}
+		]
+	}, {
+		"name": "Bourgogne-Franche-Comté",
+		"children": [
+			{"name": "Côte-d'Or", "population": 538505},
+			{"name": "Doubs", "population": 542509},
+			{"name": "Jura", "population": 271973},
+			{"name": "Nièvre", "population": 226997},
+			{"name": "Haute-Saône", "population": 247311},
+			{"name": "Saône-et-Loire", "population": 574874},
+			{"name": "Yonne", "population": 353366},
+			{"name": "Territoire de Belfort", "population": 146475}
+		]
+	}, {
+		"name": "Bretagne",
+		"children": [
+			{"name": "Côtes-d'Armor", "population": 612383},
+			{"name": "Finistère", "population": 929286},
+			{"name": "Ille-et-Vilaine", "population": 1015470},
+			{"name": "Morbihan", "population": 744663}
+		]
+	}, {
+		"name": "Centre-Val de Loire",
+		"children": [
+			{"name": "Cher", "population": 319600},
+			{"name": "Eure-et-Loir", "population": 440291},
+			{"name": "Indre", "population": 238261},
+			{"name": "Indre-et-Loire", "population": 605819},
+			{"name": "Loir-et-Cher", "population": 340729},
+			{"name": "Loiret", "population": 674913}
+		]
+	}, {
+		"name": "Corse",
+		"children": [
+			{"name": "Corse-du-Sud", "population": 145998},
+			{"name": "Haute-Corse", "population": 168869}
+		]
+	}, {
+		"name": "Grand Est",
+		"children": [
+			{"name": "Ardennes", "population": 291678},
+			{"name": "Aube", "population": 311720},
+			{"name": "Marne", "population": 579533},
+			{"name": "Haute-Marne", "population": 191004},
+			{"name": "Meurthe-et-Moselle", "population": 746502},
+			{"name": "Meuse", "population": 200509},
+			{"name": "Moselle", "population": 1066667},
+			{"name": "Bas-Rhin", "population": 1115226},
+			{"name": "Haut-Rhin", "population": 765634},
+			{"name": "Vosges", "population": 392846}
+		]
+	}, {
+		"name": "Guadeloupe",
+		"children": [
+			{"name": "Guadeloupe", "population": 409905}
+		]
+	}, {
+		"name": "Guyane",
+		"children": [
+			{"name": "Guyane", "population": 231167}
+		]
+	}, {
+		"name": "Hauts-de-France",
+		"children": [
+			{"name": "Aisne", "population": 555094},
+			{"name": "Nord", "population": 2617939},
+			{"name": "Oise", "population": 823668},
+			{"name": "Pas-de-Calais", "population": 1489209},
+			{"name": "Somme", "population": 583388}
+		]
+	}, {
+		"name": "Île-de-France",
+		"children": [
+			{"name": "Paris", "population": 2268265},
+			{"name": "Seine-et-Marne", "population": 1347008},
+			{"name": "Yvelines", "population": 1435448},
+			{"name": "Essonne", "population": 1233645},
+			{"name": "Hauts-de-Seine", "population": 1590749},
+			{"name": "Seine-Saint-Denis", "population": 1534895},
+			{"name": "Val-de-Marne", "population": 1340868},
+			{"name": "Val-d'Oise", "population": 1187836}
+		]
+	}, {
+		"name": "La Réunion",
+		"children": [
+			{"name": "La Réunion", "population": 829903}
+		]
+	}, {
+		"name": "Martinique",
+		"children": [
+			{"name": "Martinique", "population": 400535}
+		]
+	}, {
+		"name": "Normandie",
+		"children": [
+			{"name": "Calvados", "population": 699561},
+			{"name": "Eure", "population": 603194},
+			{"name": "Manche", "population": 517121},
+			{"name": "Orne", "population": 301421},
+			{"name": "Seine-Maritime", "population": 1275952}
+		]
+	}, {
+		"name": "Nouvelle-Aquitaine",
+		"children": [
+			{"name": "Charente", "population": 364429},
+			{"name": "Charente-Maritime", "population": 640803},
+			{"name": "Corrèze", "population": 252235},
+			{"name": "Creuse", "population": 127919},
+			{"name": "Dordogne", "population": 426607},
+			{"name": "Gironde", "population": 1479277},
+			{"name": "Landes", "population": 397766},
+			{"name": "Lot-et-Garonne", "population": 342500},
+			{"name": "Pyrénées-Atlantiques", "population": 674908},
+			{"name": "Deux-Sèvres", "population": 380569},
+			{"name": "Vienne", "population": 438566},
+			{"name": "Haute-Vienne", "population": 384781}
+		]
+	}, {
+		"name": "Occitanie",
+		"children": [
+			{"name": "Ariège", "population": 157582},
+			{"name": "Aude", "population": 365854},
+			{"name": "Aveyron", "population": 288364},
+			{"name": "Gard", "population": 726285},
+			{"name": "Haute-Garonne", "population": 1268370},
+			{"name": "Gers", "population": 195489},
+			{"name": "Hérault", "population": 1062617},
+			{"name": "Lot", "population": 181232},
+			{"name": "Lozère", "population": 81281},
+			{"name": "Hautes-Pyrénées", "population": 237945},
+			{"name": "Pyrénées-Orientales", "population": 457238},
+			{"name": "Tarn", "population": 387099},
+			{"name": "Tarn-et-Garonne", "population": 248227}
+		]
+	}, {
+		"name": "Pays de la Loire",
+		"children": [
+			{"name": "Loire-Atlantique", "population": 1317685},
+			{"name": "Maine-et-Loire", "population": 808298},
+			{"name": "Mayenne", "population": 317006},
+			{"name": "Sarthe", "population": 579497},
+			{"name": "Vendée", "population": 654096}
+		]
+	}, {
+		"name": "Provence-Alpes-Côte d'Azur",
+		"children": [
+			{"name": "Alpes-de-Haute-Provence", "population": 165155},
+			{"name": "Hautes-Alpes", "population": 142312},
+			{"name": "Alpes-Maritimes", "population": 1094579},
+			{"name": "Bouches-du-Rhône", "population": 2000550},
+			{"name": "Var", "population": 1026222},
+			{"name": "Vaucluse", "population": 555240}
+		]
+	}
+	]
+}
+
