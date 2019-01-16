@@ -111,7 +111,7 @@
            .attr("style", "left:" + (mouse[0] + 45) +
             "px; top:" + (mouse[1] + 45) + "px")
     if(d) {
-      tooltip.html('YEAR:' + d['Year'] + '<br/>' + 'CSIRO:' + parseFloat(d['CSIRO']).toFixed(2) + '<br/>' + 'CO2:' + d['emission'])
+      tooltip.html('YEAR:' + d['Year'] + '<br/>' + 'CSIRO:' + parseFloat(d['CSIRO']).toFixed(2) + '<br/>' + 'CO2:' + d['emission'] +' µg/m³')
     } else {
       tooltip.html('undefined')
     }
