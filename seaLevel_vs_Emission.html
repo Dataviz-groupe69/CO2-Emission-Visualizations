@@ -21,9 +21,14 @@
 </head>
 <body>
 <div>
-    <div id="charts">
-
-    </div>
+  <div id="title">
+    <p>CO2 et le niveau de la mer</p>
+    <p>
+      Le graph ci-dessous présente la relation entre l'émission CO2(µg/m³) et le niveau de la mer
+      avec les données réels entre 1950 et 2014
+    </p>
+  </div>
+  <div id="charts"></div>
 </div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
@@ -58,8 +63,8 @@
       return parseInt(d['CSIRO'])
     })).range([height, 0])
 
-    let xAxis = d3.axisBottom(xScale).ticks(5)
-    let yAxis = d3.axisLeft(yScale).ticks(5)
+    let xAxis = d3.axisBottom(xScale).ticks(10)
+    let yAxis = d3.axisLeft(yScale).ticks(10)
 
     svg.append('g')
       .attr('transform', 'translate(0,' + height + ')')
@@ -109,9 +114,10 @@
     })
     tooltip.classed("hidden", false)
            .attr("style", "left:" + (mouse[0] + 45) +
-            "px; top:" + (mouse[1] + 45) + "px")
+            "px; top:" + (mouse[1] + 85) + "px")
     if(d) {
       tooltip.html('YEAR:' + d['Year'] + '<br/>' + 'CSIRO:' + parseFloat(d['CSIRO']).toFixed(2) + '<br/>' + 'CO2:' + d['emission'] +' µg/m³')
+
     } else {
       tooltip.html('undefined')
     }
