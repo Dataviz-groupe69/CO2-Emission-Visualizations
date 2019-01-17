@@ -15,6 +15,8 @@ var svg_2 = d3.select(".chart_2").append("svg")
 var tooltip = d3.select(".chart_2").append("div")
     .attr("class", "hidden tooltip")
 
+// console.log('Coordinates: ', document.getElementsByClassName('chart_2'))
+
 function start() {
     svg_2.selectAll("circle").remove();
     svg_2.selectAll("g.x-axis").remove();
@@ -85,10 +87,12 @@ function mouseover(d) {
     let mouse = d3.mouse(svg_2.node()).map(function(x) {
         return parseInt(x)
     })
-
+    // console.log('Mouse: ', mouse)
+    let chart_2 = document.getElementsByClassName('chart_2')
+    
     tooltip.classed("hidden", false)
-        .attr("style", "left:" + (mouse[0] + window.innerWidth*0.27) +
-            "px; top:" + (mouse[1]+window.innerHeight*2.9) + "px")
+        .attr("style", "left:" + (mouse[0] + chart_2[0].offsetLeft) +
+            "px; top:" + (mouse[1] + chart_2[0].offsetTop) + "px")
     if(d) {
         tooltip.html('YEAR:' + d['Year'] + '<br/>' + 'CSIRO:' + parseFloat(d['CSIRO']).toFixed(2) + '<br/>' + 'CO2:' + d['emission'] +' µg/m³')
 
