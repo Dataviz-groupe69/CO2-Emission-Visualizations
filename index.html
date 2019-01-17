@@ -46,7 +46,29 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
     * Si on coche le boutton comparaison, un slider qui s'affiche montrant le nombre de graphes à choisir pour etre comparés. Une fois le nombre choisi, il faut selectionner les pays en question en cliquant dessus (en bubble chart)
     On peut alors visualiser un graph ainsi que des circle indicateurs montrant la valeur d'émission, et avec ceci un grouped bar chart qui affiche le pourcentage des differents secteurs (possibilité de survoler les bars chart pour voir la valeur exacte)
 </p>
-
+<h2>
+Zoom sur bubble chart</h2>
+<div class="zoom">
+    <input id="asia" type="radio" name="country" value="0">
+    <label for="asia">ASIA</label>
+    <input id="africa" type="radio" name="country" value="2">
+    <label for="africa">AFRICA</label>
+    <input id="europe" type="radio" name="country" value="1">
+    <label for="europe">EUROPE</label>
+    <input id="northAmeri" type="radio" name="country" value="7">
+    <label for="northAmeri">NORTH AMERICA</label>
+    <input id="other" type="radio" name="country" value="4">
+    <label for="other">OTHER</label>
+    <input id="southAmeri" type="radio" name="country" value="6">
+    <label for="southAmeri">SOUTH AMERICA</label>
+    <input id="australia" type="radio" name="country" value="5">
+    <label for="australia">AUSTRALIA</label>
+    <input id="centralAmer" type="radio" name="country" value="3">
+    <label for="centralAmer">CENTRAL AMERICA</label>
+    <input id="world" type="radio" name="country" checked value="8">
+    <label for="world">WORLD</label>
+</div>
+<br><br>
 <script>
     var Prograss = true;
     var brands = ['Progress Graph', 'Comparaison Graph'];
@@ -108,16 +130,30 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
     d3.json("./json/final_1.json",function(error, root) {
         var year = 2019;
         var choice = 69;
+        var countries = {}
+        var data_to_use = root;
+        d3.select("body").selectAll('input[name="country"]').on("change", function() {
+            console.log(root);
+            var val = Number(this.value);
+            svg.selectAll("g.node").remove();
+            svg.selectAll("g.leaf.node").remove();
+            if(val === 8){
+                data_to_use = root;
+                draw_nodes(data_to_use,choice,year);
+            }else {
+                data_to_use = root.children[val];
+                draw_nodes(data_to_use,choice,year);
+            }
+        });
         d3.select("#slider").on("input", function() {
-            var root_2 = root;
             year = Number(1949) + Number(this.value)
             choice = this.value - 1;
             d3.select('#year').text(year);
             //console.log(root_2);
             g.selectAll(".node").remove();
-            draw_nodes(root_2,choice,year);
+            draw_nodes(data_to_use,choice,year);
         });
-        draw_nodes(root,69,2019);
+        draw_nodes(data_to_use,69,2019);
 
 
     })
@@ -125,6 +161,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
     function draw_nodes(data,choice,year){
         // ici on remove en cas de changement d'années après compraison de graphes
         remove_graph();
+        console.log(data);
         //svg_2.selectAll("#legend").remove();
         var root_1 = d3.hierarchy(data)
         // ici on calcule l'emission par continent
@@ -185,10 +222,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
                     if (data_comparaison.length == limit) {
                         graphs_comparaison(data_comparaison, names, indices);
                     }
-                }/*else {
-
-                    zoom(root_1);
-                }*/
+                }
             }).on("mouseout",function () {
             if(Prograss){
                 remove_graph();
@@ -637,10 +671,12 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
         d3.selectAll(".city").remove();
         //d3.selectAll("line").remove();
         //svg_2.selectAll("rect").remove();
+        svg.selectAll("#co2_emission-gradient").remove();
         svg.selectAll("rect.bar").remove();
         svg.selectAll("text.surface").remove();
         svg.selectAll("g.grouped").remove();
         svg.selectAll("g#mouse-effects.mouse-over-effects").remove();
+        svg.selectAll("line.horizontal.Grid").remove();
     }
     function draw_Axis(xAxis,y,xtrasnlation,ytranslation,titre_x_pos,titre_y_pos,message){
         // add x Axis
@@ -657,13 +693,6 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
             .attr("dy", ".71em")
             .call(d3.axisLeft(y));
 
-
-        svg.selectAll("Y axis").data(y.ticks(10)).enter()
-            .append("line")
-            .attr("class", "horizontalGrid")
-            .attr("x1", diameter+20)
-            .attr("x2", 1.7*diameter)
-            .attr("y", function(d){ console.log(y(d));return y(d);})
             //.attr("y2", function(d){console.log(y(d-1000)); return y(d);});
         // ici on ajoute le titre de line chart
         svg.append("text")
@@ -821,13 +850,18 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
 
 </script>
 <!-- ici c'est la partie de rechauffement climatique -->
-
-
+<!--
+<h2> Courbes de la moyenne annuelle de changement de temperature vs le taux d'emission Co2 mondiale </h2>
+<br><br>
+<div class="chart_1"></div>
+<script src=""></script>
+-->
 <h2>Régression Linéaire et Corrélation de Pearson après normalisation de la température moyenne annuelle GISTEMP et de l'émission de CO2</h2>
 <br><br>
+
 <div class="chart"></div>
 
-<script src="js/rechauffement_vs_co2.js"></script>
+<script src="js/correlation_with_prearson_between_co2_temp.js"></script>
 
 
 <h2>L'emission de co2 et le niveau de la mer </h2>
@@ -835,8 +869,7 @@ avec des données réels entre 1950 - 2014 et de la prévision pour le reste , a
     Le graph ci-dessous présente la relation entre l'émission CO2(µg/m³) et le niveau de la mer
     avec les données réels entre 1950 et 2014
 </p>
-<div class="start"> <button  onclick="start()">Start Animation </button></div>
-
+<button class="start" onclick="start()">Start Animation</button>
 <div class="chart_2"></div>
 
 <script src="js/seaLevel_vs_co2Emission.js"></script>
