@@ -16,7 +16,6 @@
     </style>
     <script src="js/seaLevel_vs_co2Emission.js"></script>
 </head>
-<body>
 <header>
     <h2 style="text-align: center"> Proportion de co2 par pays avec prédiction des températures  et de de l'émission de co2 future </h2>
     <div>
@@ -33,12 +32,14 @@
         <input id="number_graph" type="range" value="1" min="1" max="10" step="1" width="8%" />
         <span id="graph" >1 graph comparaison</span>
     </div>
-    <div class="legend1">
-        <div class="legend1"> <p class="country-name"><span class="key-dot big"></span>Big Emission</p> </div>
-        <div class="legend1"> <p class="country-name"><span class="key-dot meduim"></span>Medium Emission</p> </div>
-        <div class="legend1"> <p class="country-name"><span class="key-dot small"></span>Small Emission</p> </div>
+    <div class="leg">
+        <div class="legend1"> <span class="key-dot big"></span>Big Emission </div>
+        <div class="legend1"> <span class="key-dot meduim"></span>Medium Emission </div>
+        <div class="legend1"> <span class="key-dot small"></span>Small Emission </div>
     </div>
 </header>
+<body>
+
 <p class="text-info"> Dans cette première partie ( Progression et comparaison de l'emission de co2 )<br>
     * On peut cocher le boutton radio Graph progression en haut à gauche, on peut ensuite survoler les pays sur le bubble chart pour voir la courbe de progression
 avec des données réels entre 1950 - 2014 et de la prévision pour le reste , ainsi qu'un bar chart qui montre les differents pourcentage d'emissions par chaque secteur<br>

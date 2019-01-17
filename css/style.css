@@ -59,14 +59,11 @@ text {
 }
 
 .big { background: #b43122;
-    margin-left: 48%;
 }
 .small { background: #1F77B4;
-    margin-left: 48%;
 }
 
 .meduim { background: #ff4009;
-    margin-left: 48%;
 }
 
 .accueil{
@@ -136,4 +133,8 @@ button{
 .text-info {
     background-color:grey;
     color:white;
+}
+
+.leg{
+    margin-left: 50%;
 }
