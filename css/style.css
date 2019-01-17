@@ -150,6 +150,10 @@ text {
 #graph,#number_graph{
     visibility: hidden;
 }
+.chart_1 {
+    margin: 0 auto;
+    display: table;
+}
 
 .chart {
     margin: 0 auto;
@@ -212,4 +216,10 @@ button{
 
 .leg{
     margin-left: 50%;
+}
+
+.line3 {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
 }

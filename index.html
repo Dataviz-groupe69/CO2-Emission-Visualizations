@@ -812,7 +812,7 @@ Zoom sur bubble chart</h2>
                 .attr("dy", "0.32em")
                 .attr("fill", "#000")
                 .attr("font-weight", "bold")
-                .attr("text-anchor", "start")
+                .attr("text-anchor", "start");
 
             var legend = svg.append("g")
                 .attr("class","legend")
@@ -850,15 +850,14 @@ Zoom sur bubble chart</h2>
 
 </script>
 <!-- ici c'est la partie de rechauffement climatique -->
-<!--
+
 <h2> Courbes de la moyenne annuelle de changement de temperature vs le taux d'emission Co2 mondiale </h2>
 <br><br>
 <div class="chart_1"></div>
-<script src=""></script>
--->
+<script src="js/rechauff_vs_co2_emission.js"></script>
+
 <h2>Régression Linéaire et Corrélation de Pearson après normalisation de la température moyenne annuelle GISTEMP et de l'émission de CO2</h2>
 <br><br>
-
 <div class="chart"></div>
 
 <script src="js/correlation_with_prearson_between_co2_temp.js"></script>
