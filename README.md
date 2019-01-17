@@ -18,3 +18,7 @@ Nous avons utilisé D3.js pour les visualisations sur la page web. Pour le trava
 
 ## Données
 Les différents datasets utilisés se trouvent sur [cette page Datahub](https://datahub.io/collections/climate-change), qui regroupe de nombreux datasets sur le changement climatique.
+
+## Sources de codes utlisées
+*   circle packing ( bubble chart ) : https://d3-wiki.readthedocs.io/zh_CN/master/Pack-Layout/
+*   pearson : https://stackoverflow.com/questions/17407100/how-do-you-draw-linear-line-in-scatter-plot-with-d3-js
