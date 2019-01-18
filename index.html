@@ -19,8 +19,9 @@
 <header>
     <h2 style="text-align: center"> Proportion de co2 par pays avec prédiction des températures  et de de l'émission de co2 future </h2>
     <div>
-        <div class="value">2019</span>
+        <span id="year">2019</span>
         <input id="slider" type="range" value="69" min="1" max="101" step="1" width="200" />
+        
         
     </div>
     <div>
@@ -850,14 +851,6 @@ Zoom sur bubble chart</h2>
     }
     
     var elem = document.querySelector('input[type="range"]');
-
-var rangeValue = function(){
-  var newValue = elem.value;
-  var target = document.querySelector('.value');
-  target.innerHTML = newValue;
-}
-
-elem.addEventListener("input", rangeValue);
 
 </script>
 <!-- ici c'est la partie de rechauffement climatique -->
