@@ -225,13 +225,6 @@ button{
 }
 
 @import url(https://fonts.googleapis.com/css?family=Dosis:700);
-body {
-  font-family: "Dosis", Helvetica, Arial, sans-serif; 
-  background: #ecf0f1;
-  color: #34495e;
-  padding-top: 40px;
-  text-shadow: white 1px 1px 1px;
-}
 .value {
   border-bottom: 4px dashed #bdc3c7;
   text-align: center;
