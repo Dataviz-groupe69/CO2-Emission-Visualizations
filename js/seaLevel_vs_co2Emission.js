@@ -49,6 +49,10 @@ function visualization(data) {
     svg_2.append('g')
         .attr('class', 'y-axis')
         .call(yAxis_2)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.2em")
+        .attr("dy", ".15em");
     svg_2.append('text')
         .attr('x', 40)
         .attr('y', 0)

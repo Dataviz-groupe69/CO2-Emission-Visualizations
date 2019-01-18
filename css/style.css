@@ -122,12 +122,6 @@ text {
     margin-right: .5em;
     width: 10px;
 }
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-}
 
 .legend {
     margin-right:20px;
@@ -144,9 +138,7 @@ text {
 .accueil{
     margin-left: 90%;
 }
-#Xaxis,#Yaxis {
 
-}
 #graph,#number_graph{
     visibility: hidden;
 }
@@ -292,3 +284,11 @@ input[type="range"]::-webkit-slider-thumb {
  footer{
      background-color: slategray;
  }
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}

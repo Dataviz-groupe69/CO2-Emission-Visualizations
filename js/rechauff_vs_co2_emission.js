@@ -81,7 +81,10 @@ d3.csv("csv/rechauffement_clim.csv", function(error, data) {
     svg_3.append("g")
         .attr("class", "y axis")
         .call(yAxis_3)
-
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.2em")
+        .attr("dy", ".15em");
     svg_3.append('text')
         .attr('x', 80)
         .attr('y', 0)
@@ -96,6 +99,10 @@ d3.csv("csv/rechauffement_clim.csv", function(error, data) {
     svg_3.append("g")
         .attr("class", "y axis")
         .call(yAxis1_3)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.2em")
+        .attr("dy", ".15em");
 
 
 

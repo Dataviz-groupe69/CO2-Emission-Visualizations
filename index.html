@@ -305,17 +305,20 @@ Zoom sur bubble chart</h2>
             svg.append("g")
                 //.attr("transform", "translate(0," + height + ")")
                 .attr('class','Xaxis')
-                .call(d3.axisBottom(x).tickSize(5))
+                .call(d3.axisBottom(x))
                 .attr("transform", "translate(0," + height + ")")
                 .selectAll("text")
                 .style("text-anchor", "end")
                 .attr("dx", "-.8em")
                 .attr("dy", ".15em")
                 .attr("transform", "rotate(-65)");
-
             // Ajout de l'axe Y au SVG avec 6 éléments de légende en utilisant la fonction ticks (sinon D3JS en place autant qu'il peut).
             svg.append("g").attr("class",'Yaxis')
-                .call(d3.axisLeft(y).ticks(6)).attr("transform", "translate(0" + (diameter+20)+ ")");
+                .call(d3.axisLeft(y)).attr("transform", "translate(0" + (diameter+20)+ ")")
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.3em")
+                .attr("dy", ".15em")
             //console.log(data);
             // Ajout des bars en utilisant les données de notre data
             svg.selectAll(".bar")
@@ -343,7 +346,7 @@ Zoom sur bubble chart</h2>
 
         var axis_y_debut = longueur_graph*0.05,
             axis_y_fin = longueur_graph*0.75,
-            axis_x_debut = diameter +30,
+            axis_x_debut = diameter +50,
             axis_x_fin = diameter*1.7;
 
         var compute_data = compute_data_object(data,indice);
@@ -388,8 +391,8 @@ Zoom sur bubble chart</h2>
         svg.append("linearGradient")
             .attr("id", "co2_emission-gradient")
             .attr("gradientUnits", "userSpaceOnUse")
-            .attr("x1", diameter+30).attr("y1", axis_y_fin)
-            .attr("x2", diameter+30).attr("y2", axis_y_debut)
+            .attr("x1", axis_x_debut).attr("y1", axis_y_fin)
+            .attr("x2", axis_x_debut).attr("y2", axis_y_debut)
             .selectAll("stop")
             .data([
                 {offset: "0%", color: "steelblue"},
@@ -425,7 +428,7 @@ Zoom sur bubble chart</h2>
     function graphs_comparaison(data_comp,names,indices){
         var axis_y_debut = longueur_graph*0.05,
             axis_y_fin = longueur_graph*0.75,
-            axis_x_debut = diameter +30,
+            axis_x_debut = diameter +50,
             axis_x_fin = diameter*1.7;
         var y = d3.scaleLinear().range([axis_y_fin, axis_y_debut]);
         var parseTime = d3.timeParse("%d-%b-%y");
@@ -713,8 +716,11 @@ Zoom sur bubble chart</h2>
             .attr("transform", "translate(0" + ytranslation+ ")")
             .attr("y", 6)
             .attr("dy", ".71em")
-            .call(d3.axisLeft(y));
-
+            .call(d3.axisLeft(y))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.2em")
+            .attr("dy", ".15em");
             //.attr("y2", function(d){console.log(y(d-1000)); return y(d);});
         // ici on ajoute le titre de line chart
         svg.append("text")
@@ -828,6 +834,10 @@ Zoom sur bubble chart</h2>
                 .attr("class", "Yaxis")
                 .attr("transform", "translate(" +(diameter+20) + ",0)")
                 .call(d3.axisLeft(y).ticks(null, "s"))
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.2em")
+                .attr("dy", ".15em")
                 .append("text")
                 .attr("x", 2)
                 .attr("y", y(y.ticks().pop()) + 0.5)

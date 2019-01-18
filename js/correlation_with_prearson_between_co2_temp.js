@@ -61,7 +61,11 @@ d3.csv("csv/rechauffement_clim_normalized.csv", types, function(error, data){
     svg1.append("g")
         .attr("class", "y axis")
         .attr("transform", "translate(10,0)")
-        .call(yAxis_1);
+        .call(yAxis_1)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.2em")
+        .attr("dy", ".15em");
 
 
 
