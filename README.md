@@ -11,7 +11,7 @@ Nous avons donc choisi de travailler sur les émissions de CO2, et ainsi de rép
 * Voir s'il existe un lien entre émissions de CO2 et augmentation du niveau de la mer
 
 ## Lien de la page web
-Les différentes visualisations se trouvent sur le lien suivant : [Visualisations](https://dataviz-groupe69.github.io/Dataviz-projet/)
+Les différentes visualisations se trouvent sur le lien suivant : [Visualisations](https://dataviz-groupe69.github.io/CO2-Emission-Visualizations/)
  
 ## Technologies utilisées
 Nous avons utilisé D3.js pour les visualisations sur la page web. Pour le travail au préalable sur les données, nous avons utilisé trifacta pour nettoyer les données, puis par la suite du python avec sci-kit learn pour calculer les corrélations ou pour faire les prédictions avec statmodels.
@@ -38,7 +38,7 @@ We have therefore chosen to work on CO2 emissions, and thus to respond to severa
 
 ## Link to the web page
 
-The different visualizations can be found on the following link: [Visualizations](https://dataviz-groupe69.github.io/Dataviz-projet/)
+The different visualizations can be found on the following link: [Visualizations](https://dataviz-groupe69.github.io/CO2-Emission-Visualizations/)
 
 ## Technologies used
 
