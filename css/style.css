@@ -281,3 +281,14 @@ input[type="range"]::-webkit-slider-thumb {
 .radio-align {
     text-align:center;
 }
+ h5,h3 {
+     text-align: center;
+ }
+
+ .auteur{
+     font-family: "Noto Kufi Arabic";
+ }
+
+ footer{
+     background-color: slategray;
+ }
