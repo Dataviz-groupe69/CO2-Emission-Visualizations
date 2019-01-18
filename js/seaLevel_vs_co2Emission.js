@@ -53,12 +53,12 @@ function visualization(data) {
         .attr('x', 40)
         .attr('y', 0)
         .attr('class', 'label')
-        .text('CSIRO')
+        .text('sea level (inch)');
     svg_2.append('text')
         .attr('x', height_2)
         .attr('y', height_2 - 5)
         .attr('class', 'label')
-        .text('CO2')
+        .text('CO2 emission (µg/m³)')
 
     svg_2.selectAll('circle')
         .data(data)

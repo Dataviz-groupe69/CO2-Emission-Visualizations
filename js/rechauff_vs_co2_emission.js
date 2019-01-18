@@ -5,7 +5,7 @@ var margin_3 = {
         left: 100
     };
 var width_3 = 800- margin_3.left - margin_3.right;
-var height_3 = 600- margin_3.top - margin_3.bottom;
+var height_3 = 700- margin_3.top - margin_3.bottom;
 
 var parseTime = d3.timeParse("%d-%b-%y");
 var x_3 = d3.scaleTime()
@@ -81,13 +81,18 @@ d3.csv("csv/rechauffement_clim.csv", function(error, data) {
     svg_3.append("g")
         .attr("class", "y axis")
         .call(yAxis_3)
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Annual Mean changement with celcuis");
 
+    svg_3.append('text')
+        .attr('x', 80)
+        .attr('y', 0)
+        .attr('class', 'label')
+        .text('Annual mean changement (C°)');
+
+    svg_3.append('text')
+        .attr('x', 100)
+        .attr('y', height_3*0.55 )
+        .attr('class', 'label')
+        .text('World Co2 emission (µg/m³)');
     svg_3.append("g")
         .attr("class", "y axis")
         .call(yAxis1_3)
@@ -114,7 +119,7 @@ d3.csv("csv/rechauffement_clim.csv", function(error, data) {
             return color_3(d.name);
         });
 
-    mean_changement_3.append("text")
+    /*mean_changement_3.append("text")
         .datum(function(d) {
             return {
                 name: d.name,
@@ -129,11 +134,11 @@ d3.csv("csv/rechauffement_clim.csv", function(error, data) {
             console.log(color_3(d.name));
             return color_3(d.name)
         })
-        .attr("id","legend")
+        /*.attr("id","legend")
         .text(function(d) {
 
             return d.name == "emission" ?"Co2 Emission":d.name;
-        });
+        });*/
 
     var mouseG_3 = svg_3.append("g")
         .attr("class", "mouse-over-effects");
@@ -166,7 +171,11 @@ d3.csv("csv/rechauffement_clim.csv", function(error, data) {
 
     mousePerLine_3.append("text")
         .attr("transform", function (d,i) {
-            return "translate(" +10+","+(i*8)+")";
+            if(i!==2) {
+                return "translate(" + 30 + "," + (i * 15) + ")";
+            }else{
+                return "translate(" + 40 + ",3)";
+            }
         });
 
     mouseG_3.append('svg:rect') // append a rect to catch mouse movements on canvas
