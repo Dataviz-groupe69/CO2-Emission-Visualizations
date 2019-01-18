@@ -103,11 +103,11 @@ Zoom sur bubble chart</h2>
         .style("font-size", "16px")
         .style("font-weight", "bold");
 
-    const diameter = Math.ceil(window.innerWidth*0.3);
+    const diameter = Math.ceil(window.innerWidth*0.5);
     var x = d3.scale.linear().range([0, diameter]);
     var y = d3.scale.linear().range([0, diameter]);
     format = d3.format(",d");
-    var longueur_graph = Math.ceil(window.innerWidth*0.2);
+    var longueur_graph = Math.ceil(window.innerWidth*0.4);
     const svg = d3.select("body").append("svg")
         .attr("width", 1.9*diameter)
         .attr("height", diameter*1.2)
