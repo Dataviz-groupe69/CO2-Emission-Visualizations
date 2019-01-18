@@ -86,6 +86,7 @@ Zoom sur bubble chart</h2>
     var data_comparaison = new Array();
     var names = new Array();
     var indices = new Array();
+    var zoom = false;
     d3.select("#number_graph").on("input",function () {
         d3.select("#graph").text(this.value + " graphs comparaison");
         limit = Number(this.value);
@@ -118,7 +119,7 @@ Zoom sur bubble chart</h2>
     const g = svg.append("g").attr("transform", "translate(2,2)");
     const pack = d3.pack()
         .size([diameter - 4, diameter - 4])
-        .padding(4);
+        .padding(4.5);
 
     var detachedContainer = document.createElement("custom");
     var dataContainer = d3.select(detachedContainer);
@@ -148,9 +149,11 @@ Zoom sur bubble chart</h2>
             svg.selectAll("g.node").remove();
             svg.selectAll("g.leaf.node").remove();
             if(val === 8){
+                zoom = !zoom;
                 data_to_use = root;
                 draw_nodes(data_to_use,choice,year);
             }else {
+                zoom = !zoom;
                 data_to_use = root.children[val];
                 draw_nodes(data_to_use,choice,year);
             }
@@ -170,6 +173,7 @@ Zoom sur bubble chart</h2>
 
     function draw_nodes(data,choice,year){
         // ici on remove en cas de changement d'années après compraison de graphes
+        console.log(zoom);
         remove_graph();
         console.log(data);
         //svg_2.selectAll("#legend").remove();
@@ -184,7 +188,15 @@ Zoom sur bubble chart</h2>
             .attr("class", function(d) { return d.children ? "node" : "leaf node"; })
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
         node.append("circle")
-            .attr("r", function(d) { return d.r>5 ? d.r:5; })
+            .attr("r", function(d) { if(d.r<5){
+                if(zoom){
+                    return 10;
+                }else{
+                    return 5;
+                }
+            }else{
+                return d.r;
+            }; })
             .attr("fill",function (d) {
                 if(d.children){
                     return "#1F77B4";
