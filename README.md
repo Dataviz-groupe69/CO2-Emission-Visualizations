@@ -23,9 +23,10 @@ Les différents datasets utilisés se trouvent sur [cette page Datahub](https://
 *   circle packing ( bubble chart ) pour D3.js: https://d3-wiki.readthedocs.io/zh_CN/master/Pack-Layout/
 *   Régression linéaire en JS : https://stackoverflow.com/questions/17407100/how-do-you-draw-linear-line-in-scatter-plot-with-d3-js
 *   Mouse circle detail : http://next.plnkr.co/edit/819nUOzwnR3nTEd6uSUK?p=preview&utm_source=legacy&utm_medium=worker&utm_campaign=next&preview
-# Project objectives
 
-or the course [Data-Visualization of the Lyon 1 Master 2](https://lyondataviz.github.io/teaching/lyon1-m2/2018/), we were asked to work on visualizations of a dataset on climate change.
+## Project objectives
+
+For the course [Data-Visualization of the Lyon 1 Master 2](https://lyondataviz.github.io/teaching/lyon1-m2/2018/), we were asked to work on visualizations of a dataset on climate change.
 
 We have therefore chosen to work on CO2 emissions, and thus to respond to several issues:
 
