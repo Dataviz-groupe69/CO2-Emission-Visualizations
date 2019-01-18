@@ -28,6 +28,7 @@ Les différents datasets utilisés se trouvent sur [cette page Datahub](https://
 
 For the course [Data-Visualization of the Lyon 1 Master 2](https://lyondataviz.github.io/teaching/lyon1-m2/2018/), we were asked to work on visualizations of a dataset on climate change.
 
+
 We have therefore chosen to work on CO2 emissions, and thus to respond to several issues:
 
 * See that CO2 emissions have been constantly increasing since the industrial period
@@ -52,5 +53,6 @@ The different datasets used can be found on this Datahub page, which contains ma
 * circle packing ( bubble chart) for D3.JS: https://d3-wiki.readthedocs.io/zh_CN/master/Pack-Layout/
 * Linear regression in JS: https://stackoverflow.com/questions/17407100/how-do-you-draw-linear-line-in-scatter-plot-with-d3-js
 * Mouse circle detail : http://next.plnkr.co/edit/819nUOzwnR3nTEd6uSUK?p=preview&utm_source=legacy&utm_medium=worker&utm_campaign=next&preview
+
 
 
