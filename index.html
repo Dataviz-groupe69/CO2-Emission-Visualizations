@@ -144,16 +144,16 @@ Zoom sur bubble chart</h2>
         var countries = {}
         var data_to_use = root;
         d3.select("body").selectAll('input[name="country"]').on("change", function() {
-            console.log(root);
+            //console.log(root);
             var val = Number(this.value);
             svg.selectAll("g.node").remove();
             svg.selectAll("g.leaf.node").remove();
             if(val === 8){
-                zoom = !zoom;
+                zoom = false;
                 data_to_use = root;
                 draw_nodes(data_to_use,choice,year);
             }else {
-                zoom = !zoom;
+                zoom = true;
                 data_to_use = root.children[val];
                 draw_nodes(data_to_use,choice,year);
             }
@@ -173,9 +173,9 @@ Zoom sur bubble chart</h2>
 
     function draw_nodes(data,choice,year){
         // ici on remove en cas de changement d'années après compraison de graphes
-        console.log(zoom);
+        //console.log(zoom);
         remove_graph();
-        console.log(data);
+        //console.log(data);
         //svg_2.selectAll("#legend").remove();
         var root_1 = d3.hierarchy(data)
         // ici on calcule l'emission par continent
@@ -214,7 +214,7 @@ Zoom sur bubble chart</h2>
         node
             .on("click",function (d) {
                 if(!Prograss) {
-                    console.log(data_comparaison.length);
+                    //console.log(data_comparaison.length);
                     if (data_comparaison.length >= limit) {
                         data_comparaison = [];
                         names = [];
